@@ -1,0 +1,18 @@
+/*
+ * Copyright (C) 2013 STMicroelectronics Limited.
+ * Author(s): Giuseppe Condorelli <giuseppe.condorelli@st.com>
+ *            Carmelo Amoroso <carmelo.amoroso@st.com>
+ *            Giuseppe Cavallaro <peppe.cavallaro@st.com>
+ *            Nunzio Raciti <nunzio.raciti@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * publishhed by the Free Software Foundation.
+ */
+
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+#include "stih419_TE.dtsi"
+#else /* This is common for h314, h318, h414, h418 */
+#include "stih418_TE.dtsi"
+#endif
+

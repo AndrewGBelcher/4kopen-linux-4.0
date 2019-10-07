@@ -1,0 +1,19 @@
+/*
+ * Copyright (C) 2015 STMicroelectronics (R&D) Limited.
+ * Author: Giuseppe Condorelli <giuseppe.condorelli@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+#include "stid325-b22xx.dtsi"
+/ {
+	model = "STiD325 HVK CADIX2 DDR4";
+	compatible = "st,stid325-b2212", "st,stid325";
+
+	memory {
+		device_type = "memory";
+		reg = <0x80000000 0x80000000>;
+	};
+};

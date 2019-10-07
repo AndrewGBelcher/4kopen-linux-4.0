@@ -1,0 +1,590 @@
+/*
+ * Copyright (C) 2013 STMicroelectronics Limited.
+ * Author(s): Giuseppe Condorelli <giuseppe.condorelli@st.com>
+ *            Carmelo Amoroso <carmelo.amoroso@st.com>
+ *            Giuseppe Cavallaro <peppe.cavallaro@st.com>
+ *            Nunzio Raciti <nunzio.raciti@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * publishhed by the Free Software Foundation.
+ */
+
+#include "stih418-display.h"
+
+/ {
+
+	soc {
+
+		pin-controller-sbc {
+			cec0 {
+				pinctrl_cec0_default: cec0-default {
+					st,pins {
+						hdmi_cec = <&PIO2 4 ALT1 BIDIR>;
+					};
+				};
+			};
+
+			hdmirx0 {
+				pinctrl_hdmirx0_default: hdmirx0-default {
+					st,pins {
+						scl = <&PIO5 7 ALT1 BIDIR>;
+						sda = <&PIO5 6 ALT1 BIDIR>;
+						pd = <&PIO5 5 ALT1 BIDIR>;
+						hpd = <&PIO5 4 ALT1 BIDIR>;
+					};
+				};
+			};
+		};
+
+		pin-controller-rear {
+			dvo {
+				pinctrl_dvo0_default: dvo-0-default {
+					st,pins {
+						DVO_HS = <&PIO30 0	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DVO_VS = <&PIO30 1	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DVO_DE = <&PIO30 2	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DVO_CK = <&PIO30 3	ALT2	OUT	CLKNOTDATA	0>;
+						DATA0 = <&PIO30 4	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA1 = <&PIO30 5	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA2 = <&PIO30 6	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA3 = <&PIO30 7	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA4 = <&PIO31 0	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA5 = <&PIO31 1	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA6 = <&PIO31 2	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA7 = <&PIO31 3	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA8 = <&PIO31 4	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA9 = <&PIO31 5	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA10 = <&PIO31 6	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA11 = <&PIO31 7	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA12 = <&PIO32 0	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA13 = <&PIO32 1	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA14 = <&PIO32 2	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA15 = <&PIO32 3	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA16 = <&PIO32 4	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA17 = <&PIO32 5	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA18 = <&PIO32 6	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA19 = <&PIO32 7	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA20 = <&PIO33 0	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA21 = <&PIO33 1	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA22 = <&PIO33 2	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA23 = <&PIO33 3	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+					};
+				};
+				pinctrl_dvo0_data_clk: dvo-0-data-clk {
+					st,pins {
+						DVO_CK = <&PIO30 3	ALT2	OUT	CLKNOTDATA	0>;
+						DATA0 = <&PIO30 4	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA1 = <&PIO30 5	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA2 = <&PIO30 6	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA3 = <&PIO30 7	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA4 = <&PIO31 0	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA5 = <&PIO31 1	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA6 = <&PIO31 2	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA7 = <&PIO31 3	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA8 = <&PIO31 4	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA9 = <&PIO31 5	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA10 = <&PIO31 6	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA11 = <&PIO31 7	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA12 = <&PIO32 0	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA13 = <&PIO32 1	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA14 = <&PIO32 2	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA15 = <&PIO32 3	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA16 = <&PIO32 4	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA17 = <&PIO32 5	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA18 = <&PIO32 6	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA19 = <&PIO32 7	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA20 = <&PIO33 0	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA21 = <&PIO33 1	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA22 = <&PIO33 2	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DATA23 = <&PIO33 3	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+					};
+				};
+				pinctrl_dvo0_sync: dvo-0-sync {
+					st,pins {
+						DVO_HS = <&PIO30 0	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DVO_VS = <&PIO30 1	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DVO_DE = <&PIO30 2	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+					};
+				};
+				pinctrl_dvo0_vga: dvo-0-vga {
+					st,pins {
+						DVO_HS = <&PIO30 0	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						DVO_VS = <&PIO30 1	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+					};
+				};
+			};
+			vga {
+				pinctrl_vga: vga-0-default {
+					st,pins {
+						VGA_HS = <&PIO35 4	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+						VGA_VS = <&PIO35 5	ALT2	OUT	SE_NICLK_IO	0 CLK_A>;
+					};
+				};
+
+			};
+		};
+
+
+	
+		/*CEC */
+		cec0: stm_cec@094a087c {
+			compatible = "st,cec";
+			status = "okay";
+			reg = <0x94a087c 0x64>;
+			interrupts = <0 140 0>;
+			clocks = <&CLK_SYSIN>;
+			clock-names = "cec_clk";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_cec0_default>;
+			resets = <&softreset STIH407_LPM_SOFTRESET>;
+		};
+
+		/* Blitter 0 */
+		blitter0:bdispII@9f10000 {
+			compatible = "st,bdispII-h418";
+			status = "okay";
+
+			/* Register and tile ram if any & Names respectively */
+			reg = <0x9f10000 0x1000>, <0x6090000 0x8000>;
+			reg-names = "bdisp-io", "bdisp-tile";
+
+			/* Interruptions & Names respectively */
+			interrupts = <0 38 0>;
+			interrupt-names = "bdisp-aq1";
+
+			aq = <1>;
+			cq = <0>;
+			line_buffer_length = <2048>;
+			mb_buffer_length = <2048>;
+			rotate_buffer_length = <256>;
+
+			/* Clock & Name & Frequency */
+			clocks = <&CLK_S_C0_FLEXGEN CLK_IC_BDISP_0>;
+			clock-names = "bdisp0";
+			clock-frequency = <400000000>;
+		};
+		/* Blitter 1 */
+		blitter1:bdispII@9f11000 {
+			compatible = "st,bdispII-h418";
+			status = "okay";
+
+			/* Register and tile ram if any & Names respectively */
+			reg = <0x9f11000 0x1000>;
+			reg-names = "bdisp-io";
+
+			/* Interruptions & Names respectively */
+			interrupts = <0 39 0>;
+			interrupt-names = "bdisp-aq1";
+
+			aq = <1>;
+			cq = <0>;
+			line_buffer_length = <2048>;
+			mb_buffer_length = <2048>;
+			rotate_buffer_length = <256>;
+
+			/* Clock & Name & Frequency */
+			clocks = <&CLK_S_C0_FLEXGEN CLK_IC_BDISP_1>;
+			clock-names = "bdisp0";
+			clock-frequency = <400000000>;
+		};
+
+		/* SSC11 to HDMI */
+		i2c11: i2c@9541000 {
+			status = "okay";
+                        st,i2c-min-scl-pulse-width-us = <0>;
+                        st,i2c-min-sda-pulse-width-us = <5>;
+		};
+
+		displaylink0:displaylink {
+				compatible = "st,displaylink", "simple-bus";
+				status = "okay";
+				rxsense-support;
+				device-id = <0>;
+				hdmi-dev = <&hdmi0>;
+				i2c-parent =<&i2c11>;
+				pipeline-id = <0>;
+				edid-reg = <0x50>;
+				edid-segment-reg = <0x30>;
+				reg-names = "edid", "edid-segment";
+		};
+
+		display_power_domains_group:display_power_domains_group {
+				compatible = "st,grp-pd";
+				#power-domain-cells = <0>;
+				power-domains = <&hqvdp10_core>, <&hqvdp11_core>, <&hqvdp12_core>;
+		};
+
+		display: stm-display@08D00000 {
+			compatible = "st,display", "simple-bus";
+			status = "okay";
+			reg = <0x08D00000 0x01D00000>;
+			dmas = <&fdma0 8 0 1>, <&fdma2>;
+			dma-names = "teletext.0", "unpaced";
+			description = "STM display DMA";
+
+			pinctrl-names = "default",  /* none */
+                            "config-1", /* VGA pads */
+                            "config-2", /* VGA pads + all DVO pins */
+                            "config-3", /* all DVO pins */
+                            "config-4", /* clk/data dvo pins + H/V DVO pads used for vga syncs */
+                            "config-5"; /* H/V DVO pads used for vga syncs */
+			pinctrl-0 = <>;
+			pinctrl-1 = <&pinctrl_vga>;
+			pinctrl-2 = <&pinctrl_dvo0_default &pinctrl_vga>;
+			pinctrl-3 = <&pinctrl_dvo0_default>;
+			pinctrl-4 = <&pinctrl_dvo0_data_clk &pinctrl_dvo0_vga>;
+			pinctrl-5 = <&pinctrl_dvo0_vga>;
+
+            /* uncomment following if only vga is enabled (usb3-dwc3 must be disabled) */
+            /* only_vga_enabled; */
+
+            /* uncomment following if vga uses dvo sync pads */
+            /* vga_using_dvo_pads; */
+
+            /* uncomment following if need to disbale all analog video DACs */
+            /* video-dacs-power-down; */
+
+			clocks = <&CLK_S_D2_QUADFS VCO>,
+					 <&CLK_S_C0_FLEXGEN CLK_MAIN_DISP>,
+					 <&CLK_S_C0_FLEXGEN CLK_AUX_DISP>,
+					 <&CLK_S_C0_FLEXGEN CLK_COMPO_DVP>,
+					 <&CLK_S_C0_FLEXGEN CLK_PROC_MIXER>,
+					 <&CLK_S_D2_QUADFS 0>,
+					 <&CLK_S_D2_QUADFS 1>,
+					 <&CLK_S_D0_FLEXGEN CLK_PCM_0>,
+					 <&CLK_TMDSOUT_HDMI>,
+					 <&CLK_S_D2_FLEXGEN 5>,
+					 <&CLK_S_D2_FLEXGEN CLK_PIX_MAIN_DISP>,
+					 <&CLK_S_D2_FLEXGEN CLK_PIX_HDDAC>,
+					 <&CLK_S_D2_FLEXGEN CLK_HDDAC>,
+					 <&CLK_S_D2_FLEXGEN CLK_PIX_AUX_DISP>,
+					 <&CLK_S_D2_FLEXGEN CLK_DENC>,
+					 <&CLK_S_D2_FLEXGEN CLK_SDDAC>,
+					 <&CLK_S_D2_FLEXGEN CLK_PIX_HDMI>,
+					 <&CLK_S_D2_FLEXGEN CLK_TMDS_HDMI>,
+					 <&CLK_S_D2_FLEXGEN CLK_REF_HDMIPHY>,
+					 <&CLK_S_D2_FLEXGEN CLK_PIX_DVO>,
+					 <&CLK_S_D2_FLEXGEN CLK_DVO>,
+					 <&CLK_S_D2_FLEXGEN 2>,
+					 <&CLK_S_D2_FLEXGEN 3>,
+					 <&CLK_S_D2_FLEXGEN 4>,
+					 <&CLK_S_D2_FLEXGEN 5>,
+					 <&CLK_S_D2_FLEXGEN 1>,
+					 <&CLK_S_C0_FLEXGEN CLK_TX_ICN_DMU>;
+
+			clock-names =   "CLK_D2_FS0_VCO",
+					"CLK_MAIN_DISP",
+					"CLK_AUX_DISP",
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+						  "CLK_PROC_GDP_COMPO",
+#else
+						  "CLK_COMPO_DVP",
+#endif
+						  "CLK_PROC_MIXER",
+						  "CLK_D2_FS0",
+						  "CLK_D2_FS1",
+						  "CLK_PCM_HDMI",
+						  "CLK_TMDSOUT_HDMI",
+						  "CLK_TMDS_HDMI_DIV2",
+						  "CLK_PIX_MAIN_DISP",
+						  "CLK_PIX_HDDAC",
+						  "CLK_HDDAC",
+						  "CLK_PIX_AUX_DISP",
+						  "CLK_DENC",
+						  "CLK_SDDAC",
+						  "CLK_PIX_HDMI",
+						  "CLK_TMDS_HDMI",
+						  "CLK_REF_HDMIPHY",
+						  "CLK_PIX_DVO",
+						  "CLK_DVO",
+						  "CLK_PIX_GDP1",
+						  "CLK_PIX_GDP2",
+						  "CLK_PIX_GDP3",
+						  "CLK_PIX_GDP4",
+						  "CLK_PIX_PIP",
+						  "CLK_TX_ICN_DMU";
+
+			clock-always_on = <1>;
+
+			assigned-clocks = <&CLK_S_D2_FLEXGEN CLK_TMDS_HDMI_DIV2>,
+					<&CLK_S_D2_FLEXGEN CLK_TMDS_HDMI>,
+					<&CLK_S_C0_FLEXGEN CLK_MAIN_DISP>,
+					<&CLK_S_C0_FLEXGEN CLK_AUX_DISP>,
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+					<&CLK_S_C0_FLEXGEN CLK_PROC_GDP_COMPO>,
+#else
+					<&CLK_S_C0_FLEXGEN CLK_COMPO_DVP>,
+#endif
+					<&CLK_S_C0_FLEXGEN CLK_PROC_MIXER>;
+
+			assigned-clock-parents = <&CLK_TMDSOUT_HDMI>,
+					<&CLK_TMDSOUT_HDMI>,
+					<&CLK_S_C0_PLL1 0>,
+					<&CLK_S_C0_PLL1 0>,
+					<&CLK_S_C0_PLL0 0>,
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+					<&CLK_S_C0_PLL1 0>;
+#else
+					<&CLK_S_C0_PLL0 0>;
+#endif
+
+			assigned-clock-rates = <(594000000/2)>,
+					<0>,
+					<400000000>,
+					<400000000>,
+					<355000000>,
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+					<400000000>;
+#else
+					<355000000>;
+#endif
+
+			power-domains = <&display_power_domains_group>;
+
+			plug_fifo_size      = <4096>;  /* Bytes */
+                        plug_bus_width      = <16>;    /* Bytes */
+                        plug_bus_clk_name   = "CLK_TX_ICN_DMU";
+
+			firmwares {
+				denc.fw = "denc_H407_b2120.fw";
+				hdf.fw = "hdf_H407_b2120.fw";
+			};
+
+
+
+			main {
+				display-pipe = "STiH418-main";
+				interrupts = <0 108 0>;
+				main-output-id = <OUTPUT_IDX_MAIN>;
+				hdmi-output-id = <OUTPUT_IDX_HDMI>;
+				dvo-output-id = <0xFFFFFFFF>; /* -1 ( none ) */
+				/* whitelist = <STiH418_REGISTER_BASE + STiH418_DENC_BASE,
+				STiH418_REGISTER_BASE + STiH418_DENC_BASE+PAGE_SIZE,
+				STiH418_REGISTER_BASE + STiH48_DENC_BASE+(PAGE_SIZE*2)>;*/
+				whitelist = <0x0A800000 0x0A801000 0x0A802000>;
+				io-offset = <0>;
+
+				planes {
+					plane-0 {
+						id = <PLANE_IDX_GDP1>;
+						/* flags = <STMCORE_PLANE_GFX   | STMCORE_PLANE_PREFERRED | STMCORE_PLANE_MEM_ANY>; */
+						flags = <54>;
+					};
+					plane-1 {
+						id = <PLANE_IDX_GDP2>;
+						/*flags = <STMCORE_PLANE_GFX   | STMCORE_PLANE_MEM_ANY>;*/
+						flags = <50>;
+					};
+					plane-2 {
+						id = <PLANE_IDX_GDP3>;
+						/* flags = <STMCORE_PLANE_GFX  | STMCORE_PLANE_MEM_ANY>;*/
+						flags = <50>;
+					};
+					plane-3 {
+						id = <PLANE_IDX_GDP4>;
+						/*flags = <STMCORE_PLANE_GFX   | STMCORE_PLANE_MEM_ANY>;*/
+						flags = <50>;
+					};
+					plane-4 {
+						id = <PLANE_IDX_VID_MAIN_1>;
+						/*flags = <STMCORE_PLANE_VIDEO | STMCORE_PLANE_PREFERRED | STMCORE_PLANE_MEM_ANY>;*/
+						flags = <52>;
+					};
+					plane-5 {
+						id = <PLANE_IDX_VID_MAIN_2>;
+						/*flags = <STMCORE_PLANE_VIDEO | STMCORE_PLANE_MEM_ANY>;*/
+						flags = <49>;
+					};
+					plane-6 {
+						id = <PLANE_IDX_VBI_MAIN>;
+						/*flags = <STMCORE_PLANE_GFX   | STMCORE_PLANE_MEM_ANY>;*/
+						flags = <50>;
+					};
+				};
+			};
+
+			aux {
+				display-pipe = "STiH418-aux";
+				interrupts = <0 109 0>;
+				main-output-id = <OUTPUT_IDX_AUX>;
+				hdmi-output-id = <0xFFFFFFFF> /* -1 */;
+				dvo-output-id = <0xFFFFFFFF> /* -1 */;
+				/* whitelist = <STiH418_REGISTER_BASE + STiH418_DENC_BASE,
+				STiH418_REGISTER_BASE + STiH418_DENC_BASE+PAGE_SIZE,
+				STiH418_REGISTER_BASE + STiH418_DENC_BASE+(PAGE_SIZE*2)>;*/
+				whitelist = <0x0A800000 0x0A801000 0x0A802000>;
+				io-offset = <0>;
+
+				planes {
+					plane-0 {
+						id = <PLANE_IDX_GDP3>;
+						/* flags = <STMCORE_PLANE_GFX   | STMCORE_PLANE_PREFERRED | STMCORE_PLANE_MEM_ANY>;*/
+						flags = <54>;
+					};
+					plane-1 {
+						id = <PLANE_IDX_GDP4>;
+						/*flags = <STMCORE_PLANE_GFX   | STMCORE_PLANE_MEM_ANY>;*/
+						flags = <50>;
+					};
+					plane-2 {
+						id = <PLANE_IDX_VID_MAIN_2>;
+						/* flags = <STMCORE_PLANE_VIDEO | STMCORE_PLANE_PREFERRED | STMCORE_PLANE_MEM_ANY>; */
+						flags = <53>;
+					};
+				};
+			};
+		};
+
+		/* Copy Protection driver */
+		stmcp: cp0 {
+			compatible = "st,stmcp", "simple-bus";
+			status = "okay";
+		};
+
+		/* HDMI-Tx */
+		hdmi0:hdmi-repeater@08D04000 {
+			compatible = "st,hdmi-repeater","simple-bus";
+			status = "okay";
+			interrupts = <0 106 0>;
+			reg = <0x0A804000 0x800>;
+			pipeline-id = <0>;
+			link-dev = <&displaylink0>;
+			hdmi-phy-config {
+				tmds0 {
+					freq = <0 145000000>;
+					config = <0x0 0x0 0x0 0x0>;
+				};
+				tmds1 {
+					freq = <145000000 165000000>;
+					config = <0x1110 0x00000000 0x00000000 0x0>;
+				};
+				tmds2 {
+					freq = <165000000 340000000>;
+					config = <0x1110 0x00030003 0x00000003 0x0>;
+				};
+				tmds3 {
+					freq = <340000000 600000000>;
+					config = <0x200000 0x0 0x0 0x0>;
+				};
+			};
+		};
+
+		/* HDMI-Rx*/
+		hdmirx0:hdmirx@08D20000 {
+			compatible = "st,hdmirx", "simple-bus";
+			status = "okay";
+			reg = <0x08D20000 0x8000>,
+			      <0x08F80000 0x8000>,
+			      <0x08D20000 0x8000>,
+			      <0x094A0770 0x4000>;
+			reg-names = "reg-core", "reg-phy", "reg-clk", "reg-csm";
+			interrupts = <0 110 0>,<0 140 0>;
+			clock-frequency-meas = <30000000>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_hdmirx0_default>;
+			edid-wp-gpios = <&PIO2 5 0>;
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+			clocks = <&CLK_S_C0_FLEXGEN CLK_PROC_DVP>;
+			clock-names = "CLK_PROC_DVP";
+#else
+			clocks = <&CLK_S_C0_FLEXGEN CLK_COMPO_DVP>;
+			clock-names = "CLK_COMPO_DVP";
+#endif
+			clock-frequency = <400000000>;
+
+			route0 {
+				route-id = <0>;
+				output-pixel-width = <0x02>;
+				i2s-out-clk-scale-factor = <256>;
+				clk-gen-aud-id = <1>;
+				clk-gen-vid-id = <0>;
+				rterm-mode = <0>;
+				rterm-val = <0x3>;
+			};
+
+			port0 {
+				port-id = <0>;
+				csm-port-id = <0 0 1>;
+				port-detect-option = <0>;
+				hpd-enable;
+				/*edid-internal;*/
+				max-edid-block = <2>;
+				route-mask = <0x3>;
+				route-eq-mode = <3>;
+				route-op-mode = <0x08>;
+				route-eq-config {
+					low-freq-gain = <0x7>;
+					high-freq-gain = <0x0>;
+				};
+			};
+		};
+
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+		/* Compo-Capture */
+		compo0:compo-capture@0a6e0000 {
+			compatible = "st,compo-capture-v3.0.1";
+			/* Always enable as only soc dependent */
+			status = "okay";
+
+			/* Register and tile ram if any & Names respectively */
+			reg = <0x0a6e0000 0x1000>;
+			reg-names = "capture-io";
+		};
+
+		/* DVP-Capture IP v1.11 */
+		dvp0:dvp-capture@0b200000 {
+			compatible = "st,dvp-v1.11", "st,dvp-capture";
+			status = "okay";
+
+			/* Register and tile ram if any & Names respectively */
+			reg = <0x0b200000 0x1000>;
+			reg-names = "capture-io";
+
+			/* Interruptions & Names respectively */
+			interrupts = <GIC_SPI 67 IRQ_TYPE_NONE>;
+			interrupt-names = "capture-int";
+
+			clocks = <&CLK_S_C0_FLEXGEN CLK_PROC_DVP>;
+			clock-names = "CLK_PROC_DVP";
+			clock-frequency = <400000000>;
+			/* Reset register */
+			sys-reset-register = <0x92b020c>;
+			sys-reset-bit = <13>;
+		};
+
+#else
+		/* Compo-Capture */
+		compo0:compo-capture@0a6e0000 {
+			compatible = "st,compo-capture-v3.0";
+			/* Always enable as only soc dependent */
+			status = "okay";
+
+			/* Register and tile ram if any & Names respectively */
+			reg = <0x0a6e0000 0x1000>;
+			reg-names = "capture-io";
+		};
+
+		/* DVP-Capture IP v1.6 with chroma hscr block (support 422 input) */
+		dvp0:dvp-capture@9d12000 {
+			compatible = "st,dvp-v1.6", "st,dvp-capture";
+			status = "okay";
+
+			/* Register and tile ram if any & Names respectively */
+			reg = <0x9d12000 0x1000>;
+			reg-names = "capture-io";
+
+			/* Interruptions & Names respectively */
+			interrupts = <GIC_SPI 67 IRQ_TYPE_NONE>;
+			interrupt-names = "capture-int";
+
+			clocks = <&CLK_S_C0_FLEXGEN CLK_COMPO_DVP>;
+			clock-names = "CLK_COMPO_DVP";
+			clock-frequency = <400000000>;
+			/* Reset register */
+			sys-reset-register = <0x92b020c>;
+			sys-reset-bit = <13>;
+		};
+#endif
+	};
+};

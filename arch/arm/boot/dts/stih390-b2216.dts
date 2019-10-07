@@ -1,0 +1,173 @@
+/*
+ * Copyright (C) 2015 STMicroelectronics (R&D) Limited.
+ * Author: Guillaume Kouadio Carry <guillaume.kouadio-carry@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+#include "stih390.dtsi"
+/ {
+	model = "STiH390 B2216";
+	compatible = "st,stih390-b2216", "st,stih390";
+
+	memory {
+		device_type = "memory";
+		reg = <0x80000000 0x40000000>;
+	};
+
+	chosen {
+		bootargs = "lpj=1994752 console=ttyAS0,115200 earlyprintk";
+		linux,stdout-path = &serial11;
+	};
+
+	aliases {
+		ttyAS0 = &serial11;
+	};
+
+	sound {
+		compatible = "st,snd-soc-sti";
+		status = "okay";
+		st,card-name = "sti audio card";
+
+		st,asoc-platform = <&sti_asoc_platform>;
+		st,backend-name  = "I2S_out", "HDMI_out",
+				   "Analog_out", "spdif",
+				   "I2S_in", "HDMI_in";
+		st,backend-cpu-dai = <&snd_uni_player0 &snd_uni_player1
+				      &snd_uni_player2 &snd_uni_player3
+				      &snd_uni_reader0 &snd_uni_reader1>;
+		st,backend-codec = <&sti_sasg_codec &sti_sasg_codec
+				    &sti_sasg_codec &sti_sasg_codec
+				    &sti_sasg_codec &sti_sasg_codec>;
+		st,backend-codec-dai = "sas-dai-dummy", "sas-dai-dummy",
+				       "sas-dai-dac", "sas-dai-spdif-out",
+				       "sas-dai-dummy", "sas-dai-dummy";
+	};
+
+	soc {
+		serial10: serial10@0a1a0000 {
+			status = "okay" ;
+		};
+
+		serial11: serial11@0a1b0000 {
+			status = "okay" ;
+		};
+
+		spi10: spi10@0a1c0000 {
+			status = "okay" ;
+		};
+
+		i2c12: i2c12@0a1e0000 {
+			status = "okay" ;
+		};
+
+		/* FlashSS Flash/ eMMC/ SD */
+		mmc0: sdhci@1e300000 {
+			status = "okay";
+		};
+
+		/* SD3.0/SDIO */
+		mmc1: sdhci@1e600000 {
+			status = "okay";
+		};
+
+		spi5: spi5@08a40000 {
+			status = "okay" ;
+		};
+
+		i2c6: i2c6@08a41000 {
+			status = "okay" ;
+		};
+
+		i2c11: i2c11@0a1d0000 {
+			status = "okay" ;
+		};
+
+		serial3: serial3@08a30000 {
+			status = "okay" ;
+		};
+
+		/* Uniperipheral players/readers */
+		snd_uni_player0: snd-uni-player@0 {
+			status = "okay";
+		};
+
+		snd_uni_player1: snd-uni-player@1 {
+			status = "okay";
+		};
+
+		snd_uni_player2: snd-uni-player@2 {
+			status = "okay";
+		};
+
+		snd_uni_player3: snd-uni-player@3 {
+			status = "okay";
+		};
+
+		snd_uni_reader0: snd-uni-reader@0 {
+			status = "okay";
+		};
+
+		snd_uni_reader1: snd-uni-reader@1 {
+			status = "okay";
+		};
+
+		nandbch: nand-bch {
+			status = "okay";
+			st,nand-banks = <&nand_banks>;
+		};
+
+		nand_banks: nand-banks {
+			bank0 {
+				/* NAND_BBT_USE_FLASH (4Gbit) */
+				nand-on-flash-bbt;
+				nand-no-autoincr;
+				st,nand-cs = <0>;
+				st,nand-timing-data = <&nand_timing0>;
+				partitions {
+					#address-cells = <1>;
+					#size-cells = <1>;
+					partition@0{
+						label = "NAND Flash 1";
+						reg = <0x00000000 0x1e000000>;
+					};
+				};
+			};
+		};
+
+		nand_timing0: nand-timing {
+			sig-setup = <10>;
+			sig-hold = <10>;
+			CE-deassert = <0>;
+			WE-to-RBn = <100>;
+			wr-on = <10>;
+			wr-off = <30>;
+			rd-on = <10>;
+			rd-off = <30>;
+			chip-delay = <30>;		/* delay in us */
+		};
+
+		spisfc: spisfc@1e302000 {
+			/* flash used: mx25l25635f */
+			status = "okay";
+			partitions = <&b2216_fsm_partitions>;
+
+			b2216_fsm_partitions: partitions-b2216 {
+				#address-cells = <1>;
+				#size-cells = <1>;
+				partition@0 {
+					label = "boot";
+					/* 20M */
+					reg = <0x00000000 0x01400000>;
+				};
+				partition@a00000 {
+					label = "rest";
+					/* 12M */
+					reg = <0x01400000 0x00c00000>;
+				};
+			};
+		};
+	};
+};

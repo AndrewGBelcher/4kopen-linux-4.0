@@ -1,0 +1,1 @@
+cmd_drivers/lpm/built-in.o :=  /starkl/outputs/starkl-b2264-default/buildroot/host/usr/bin/arm-linux-ld -EL    -r -o drivers/lpm/built-in.o drivers/lpm/st_lpm_mb.o drivers/lpm/st_lpm_com.o ; scripts/mod/modpost drivers/lpm/built-in.o

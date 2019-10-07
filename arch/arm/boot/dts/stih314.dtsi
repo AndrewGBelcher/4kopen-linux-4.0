@@ -1,0 +1,26 @@
+/*
+ * Copyright (C) 2015 STMicroelectronics (R&D) Limited.
+ * Author: Pankaj Dev <pankaj.dev@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+#include "stih418.dtsi"
+#include "stih314-clkconf.dtsi"
+/ {
+	clocks {
+		compatible = "st,stih314-clk", "simple-bus";
+	};
+
+	cpus {
+		cpu@0 {
+			operating-points = <
+                               /* kHz   uV, dummy values */
+                               800000   900000
+                               500000   900000
+			 >;
+			cpu0-supply = <&pwm_regulator>;
+		};
+	};
+};

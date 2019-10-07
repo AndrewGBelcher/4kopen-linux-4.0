@@ -1,0 +1,8 @@
+#define CONF_SOC
+#define CONF_BOARD_b2264
+#define CONF_SOC_h418
+#define CONF_MAP_2GB
+#define CONF_KERNEL_3_10_sti
+#define CONF_FRONTEND_NO_FE
+#define PHYS_MEM_START 0x80000000
+#include "sdk2_stih418-family.dtsp"

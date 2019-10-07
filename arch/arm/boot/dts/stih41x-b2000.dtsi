@@ -1,0 +1,120 @@
+/*
+ * Copyright (C) 2013 STMicroelectronics (R&D) Limited.
+ * Author: Srinivas Kandagatla <srinivas.kandagatla@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * publishhed by the Free Software Foundation.
+ */
+#include <dt-bindings/input/input.h>
+/ {
+
+	memory{
+		device_type = "memory";
+		reg = <0x60000000 0x40000000>;
+	};
+
+	chosen {
+		bootargs = "console=ttyAS0,115200";
+		linux,stdout-path = &serial2;
+	};
+
+	aliases {
+		ttyAS0 = &serial2;
+		ethernet0 = &ethernet0;
+		ethernet1 = &ethernet1;
+		usb0 = &usb0;
+		usb1 = &usb1;
+		usb2 = &usb2;
+	};
+
+	soc {
+		serial2: serial@fed32000 {
+			status = "okay";
+		};
+
+		leds {
+			compatible	= "gpio-leds";
+			fp_led {
+				#gpio-cells = <1>;
+				label	= "Front Panel LED";
+				gpios	= <&PIO105 7 0>;
+				linux,default-trigger	= "heartbeat";
+			};
+		};
+
+		ethernet0: dwmac@fe810000 {
+			status 		= "okay";
+			st,tx-retime-src	= "txclk";
+
+			phy-mode		= "mii";
+
+			snps,reset-gpio 	= <&PIO106 2 0>;
+			snps,reset-active-low;
+			snps,reset-delays-us 	= <0 10000 10000>;
+		};
+
+		ethernet1: dwmac@fef08000 {
+			status 		= "okay";
+			st,tx-retime-src	= "txclk";
+
+			phy-mode		= "mii";
+
+			snps,reset-gpio 	= <&PIO4 7 0>;
+			snps,reset-active-low;
+			snps,reset-delays-us 	= <0 10000 10000>;
+		};
+
+		lpm:stm-lpm@fe400000 {
+			status = "okay";
+			gpios = <&PIO4 3 0>;
+			lmi,retention-gpio = <&PIO4 4 0>;
+		};
+
+		/* HDMI Tx I2C */
+		i2c@fed41000 {
+			/* HDMI V1.3a supports Standard mode only */
+			clock-frequency = <100000>;
+			st,i2c-min-scl-pulse-width-us = <0>;
+			st,i2c-min-sda-pulse-width-us = <1>;
+
+			status = "okay";
+		};
+
+		/* On the reference boards, the mmc can be available if use the
+		   b2048 daughter board exclusively plugged on CN22 (often used
+		   for b2032 daughter board (PHY device).
+		   The b2048 can be available with eMMC or SD/MMC slot so
+		   "non-removable" field should be used as consequence of the
+		   selected setup.
+
+		mmc0: sdhci@fe81e000 {
+			status	= "okay";
+			non-removable;
+		};
+		*/
+
+		usb0: usb@fe100000 {
+			status = "okay";
+		};
+
+		usb1: usb@fe200000 {
+			status = "okay";
+		};
+
+		usb2: usb@fe300000 {
+			status = "okay";
+		};
+
+		keyscan: keyscan@fe4b0000 {
+			keypad,num-rows = <4>;
+			keypad,num-columns = <4>;
+			st,debounce_us = <5000>;
+			linux,keymap = < /* in0	in1	in2	in3 */
+				KEY_F13 KEY_F9  KEY_F5 KEY_F1		/* out0 */
+				KEY_F14 KEY_F10 KEY_F6 KEY_F2		/* out1 */
+				KEY_F15 KEY_F11 KEY_F7 KEY_F3		/* out2 */
+				KEY_F16 KEY_F12 KEY_F8 KEY_F4 >;	/* out3 */
+		};
+	};
+};

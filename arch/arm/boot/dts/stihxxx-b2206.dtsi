@@ -1,0 +1,316 @@
+/*
+ * Copyright (C) 2014 STMicroelectronics (R&D) Limited.
+ * Author: Allen Wu <allen.wu@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+#include <dt-bindings/input/input.h>
+/ {
+	chosen {
+		bootargs = "console=ttyAS0,115200";
+		linux,stdout-path = &sbc_serial1;
+	};
+
+	aliases {
+		ttyAS0 = &sbc_serial1;
+		ethernet0 = &ethernet0;
+		usb0 = &usb0;
+		usb1 = &usb1;
+	};
+	sound {
+		compatible = "st,snd-soc-sti";
+		status = "okay";
+		st,card-name = "sti audio card";
+
+		st,asoc-platform = <&sti_asoc_platform>;
+		st,backend-name  = "HDMI_out", "PCM_out",
+				   "Analog_out", "spdif",
+				   "PCM_in", "HDMI_in";
+		st,backend-cpu-dai = <&snd_uni_player0 &snd_uni_player1
+				      &snd_uni_player2 &snd_uni_player3
+				      &snd_uni_reader0 &snd_uni_reader1 >;
+		st,backend-codec = <&sti_sasg_codec &sti_sasg_codec
+				    &sti_sasg_codec &sti_sasg_codec
+				    &sti_sasg_codec &sti_sasg_codec>;
+		st,backend-codec-dai = "sas-dai-dummy", "sas-dai-dummy",
+				       "sas-dai-dac", "sas-dai-spdif-out",
+				       "sas-dai-dummy","sas-dai-dummy";
+	};
+
+	soc {
+		pin-controller-sbc {
+			keyscan {
+				pinctrl_keyscan: keyscan {
+					st,pins {
+						keyin0 = <&PIO4 4 ALT4 IN>;
+						keyin1 = <&PIO4 5 ALT4 IN>;
+						keyin2 = <&PIO0 4 ALT2 IN>;
+						keyin3 = <&PIO2 6 ALT2 IN>;
+
+						keyout0 = <&PIO4 6 ALT4 OUT>;
+						keyout1 = <&PIO4 7 ALT4 OUT>;
+						keyout2 = <&PIO5 2 ALT4 OUT>;
+						keyout3 = <&PIO2 7 ALT2 OUT>;
+					};
+				};
+			};
+		};
+
+		sbc_serial1: serial@9531000 {
+			status = "okay";
+		};
+
+		rc: rc@09518000 {
+			status = "okay";
+		};
+
+		/* SSC4 to NIM-A */
+		i2c4: i2c@9844000 {
+			status = "okay";
+		};
+
+		/* SSC5 to NIM-B */
+		i2c5: i2c@9845000 {
+			status = "okay";
+		};
+
+		/* SSC11 to HDMI */
+		i2c11: i2c@9541000 {
+			status = "okay";
+			/* HDMI V1.3a supports Standard mode only */
+			clock-frequency = <100000>;
+			st,i2c-min-scl-pulse-width-us = <0>;
+			st,i2c-min-sda-pulse-width-us = <5>;
+		};
+
+		lpm:stm-lpm@9400000 {
+			status = "okay";
+			gpios = <&PIO3 2 0>;
+			st,lmi-ret-gpio = <&PIO5 2 0>;
+		};
+
+		gmac1 {
+			rgmii1-0 {
+				st,pins {
+					rxclk = <&PIO2 2 ALT1 IN NICLK 1000 CLK_A>;
+				};
+			};
+		};
+
+		ethernet0: dwmac@9630000 {
+			status = "okay";
+			phy-mode = "rgmii";
+			st,tx-retime-src = "clkgen";
+			fixed-link = <1 1000 0 0>;
+			snps,phy-addr = <0x1>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_rgmii1>;
+
+			/* In case of using a PHY daughter board (instead
+			 * of the embedded switch) remove fixed link.
+			 *
+			 * pinctrl-0 = <&pinctrl_rgmii1 &pinctrl_rgmii1_mdio
+			 *              &pinctrl_rgmii1_mdint>;
+			 * snps,reset-gpio = <&PIO17 7 0>;
+			 * snps,reset-active-low;
+			 * snps,reset-delays-us = <0 10000 1000000>;
+			 */
+
+		};
+
+		/* Disable it in case of using a PHY daughter board */
+
+		/* CLK_ETH_PHY has to reduced to 25MHz and speed fixed to 100
+		 * for stability problems.
+		 */
+		realtek: rtl8367rb {
+			compatible = "realtek,rtl8367rb";
+			status = "okay";
+
+			gpio-reset = <&PIO3 5 0>;
+			gpio-sck = <&PIO1 1 0>;
+			gpio-sda = <&PIO1 0 0>;
+
+			rtl8367rb,extif1;
+			rtl8367rb,extif1-mode = <1>; // RGMII
+			rtl8367rb,extif1-txdelay = <0>;
+			rtl8367rb,extif1-rxdelay = <1>;
+			rtl8367rb,extif1-force_mode = <1>;
+			rtl8367rb,extif1-txpause = <2>;
+			rtl8367rb,extif1-rxpause = <2>;
+			rtl8367rb,extif1-link = <1>;
+			rtl8367rb,extif1-duplex = <1>;
+			rtl8367rb,extif1-speed = <1>; // 100M speed
+
+			rtl8367rb,extif2;
+			rtl8367rb,extif2-mode = <1>; // RGMII
+			rtl8367rb,extif2-txdelay = <0>;
+			rtl8367rb,extif2-rxdelay = <1>;
+			rtl8367rb,extif2-force_mode = <1>;
+			rtl8367rb,extif2-txpause = <1>;
+			rtl8367rb,extif2-rxpause = <1>;
+			rtl8367rb,extif2-link = <1>;
+			rtl8367rb,extif2-duplex = <1>;
+			rtl8367rb,extif2-speed = <2>; // 1000M speed
+		};
+
+		usb0: usb@9A00000 {
+			status = "okay";
+		};
+
+		usb1: usb@9A80000 {
+			status = "okay";
+		};
+
+		st_dwc3: dwc3@8f94000 {
+			status = "okay";
+		};
+
+                miphy28lp_phy0: miphy28lp@0 {
+                        status = "okay";
+                };
+
+		miphy28lp_phy1: miphy28lp@1 {
+			st,sata_gen = "gen3";
+			status = "okay";
+		};
+
+		pcie0: pcie@9b00000 {
+			/* Override "lmi mem window" size : 3GB */
+			reg = <0x09b00000 0x00001000
+			       0x2fff0000 0x00010000
+			       0x40000000 0xc0000000   /* lmi mem window */
+			       0xd8 0x04
+			       0xe0 0x04>;
+			status = "okay";
+		};
+
+		pcie1: pcie@9b10000 {
+			/* Override "lmi mem window" size : 3GB */
+			reg = <0x09b10000 0x00001000
+			       0x3fff0000 0x00010000
+			       0x40000000 0xc0000000   /* lmi mem window */
+			       0xdc 0x04
+			       0xe4 0x04>;
+		};
+
+		sata1: sata@9b28000 {
+			status = "okay";
+		};
+
+		keyscan: keyscan@94b0000 {
+			compatible = "st,keypad";
+			status = "disabled";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_keyscan>;
+			keypad,num-rows = <4>;
+			keypad,num-columns = <4>;
+			st,debounce_us = <5000>;
+			linux,keymap = < /* in0	  in1	in2	in3 */
+				KEY_F13 KEY_F9  KEY_F5 KEY_F1	/* out0 */
+				KEY_F14 KEY_F10 KEY_F6 KEY_F2	/* out1 */
+				KEY_F15 KEY_F11 KEY_F7 KEY_F3	/* out2 */
+				KEY_F16 KEY_F12 KEY_F8 KEY_F4 >;/* out3 */
+		};
+
+		spifsm@9022000 {
+			status = "okay";
+			flash-name = "mx25l25635f";
+			partitions = <&b2206_fsm_partitions>;
+
+			b2206_fsm_partitions: partitions-b2206 {
+				#address-cells = <1>;
+				#size-cells = <1>;
+				partition@0 {
+					label = "boot";
+					/* 20M */
+					reg = <0x00000000 0x01400000>;
+				};
+				partition@1400000 {
+					label = "rest";
+					/* 12M */
+					reg = <0x01400000 0x00c00000>;
+				};
+			};
+		};
+
+		nandbch: nand-bch {
+			status = "okay";
+			st,nand-banks = <&nand_banks>;
+		};
+
+		nand_banks: nand-banks {
+			bank0 {
+				/* NAND_BBT_USE_FLASH (4Gbit) */
+				nand-on-flash-bbt;
+				nand-no-autoincr;
+				st,nand-cs = <0>;
+				st,nand-timing-data = <&nand_timing0>;
+				partitions {
+					#address-cells = <1>;
+					#size-cells = <1>;
+					partition@0{
+						label = "NAND Flash 1";
+						reg = <0x00000000 0x1e000000>;
+					};
+				};
+			};
+		};
+
+		nand_timing0: nand-timing {
+			sig-setup = <10>;
+			sig-hold = <10>;
+			CE-deassert = <0>;
+			WE-to-RBn = <100>;
+			wr-on = <10>;
+			wr-off = <30>;
+			rd-on = <10>;
+			rd-off = <30>;
+			chip-delay = <30>;		/* delay in us */
+		};
+
+		/* Enable when use the B2143 eMMC daughter board. */
+		mmc0: sdhci@09060000 {
+			non-removable;
+		};
+
+		/* Uniperipheral */
+		snd_uni_player0: snd-uni-player@0 {
+			status = "okay";
+		};
+
+		snd_uni_player1: snd-uni-player@1 {
+			status = "okay";
+		};
+
+		snd_uni_player2: snd-uni-player@2 {
+			status = "okay";
+		};
+
+		snd_uni_player3: snd-uni-player@3 {
+			status = "okay";
+		};
+
+		snd_uni_reader0: snd-uni-reader@0 {
+			status = "okay";
+		};
+
+		snd_uni_reader1: snd-uni-reader@1 {
+			status = "okay";
+		};
+
+		gpio_keys {
+			compatible = "gpio-keys";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			button@1 {
+				label = "wakeup";
+				linux,code = <41>;
+				gpios = <&PIO3 3 1>;
+				gpio-key,wakeup;
+			};
+		};
+	};
+};

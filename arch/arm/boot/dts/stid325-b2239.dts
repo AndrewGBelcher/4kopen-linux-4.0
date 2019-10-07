@@ -1,0 +1,86 @@
+/*
+ * Copyright (C) 2015 STMicroelectronics (R&D) Limited.
+ * Author: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+#include "stid325-b22xx.dtsi"
+/ {
+	model = "STiD325 HDK CADIX2 DDR3";
+	compatible = "st,stid325-b2239", "st,stid325";
+
+	memory {
+		device_type = "memory";
+		reg = <0x80000000 0x40000000>;
+	};
+
+	soc {
+		/* Voltage measurement (for debugging) */
+		i2c0: i2c0@08a40000 {
+			status = "okay";
+		};
+
+		/* MoCA */
+		i2c1: i2c1@08a41000 {
+			status = "okay";
+		};
+
+		/* FST XCVR */
+		i2c2: i2c2@a190000 {
+			status = "okay";
+		};
+
+		/* Debug purpose */
+		i2c3: i2c3@a1a0000 {
+			status = "okay";
+		};
+
+		/* Battery */
+		i2c4: i2c4@a1b0000 {
+			status = "okay";
+		};
+
+		mmc0: sdhci@1e600000 {
+			status = "okay";
+		};
+
+		nandbch: nand-bch {
+			status = "okay";
+			st,nand-banks = <&nand_banks>;
+		};
+
+		/* MT29F4G08ABAEAH4 */
+		nand_banks: nand-banks {
+			bank0 {
+				/* NAND_BBT_USE_FLASH (4Gbit) */
+				nand-on-flash-bbt;
+				nand-no-autoincr;
+				st,nand-cs = <0>;
+				st,nand-timing-data = <&nand_timing0>;
+				partitions {
+					#address-cells = <1>;
+					#size-cells = <1>;
+					partition@0{
+						label = "NAND Flash 1";
+						reg = <0x00000000 0x1e000000>;
+					};
+				};
+			};
+		};
+
+		nand_timing0: nand-timing {
+			sig-setup = <10>;
+			sig-hold = <10>;
+			CE-deassert = <0>;
+			WE-to-RBn = <100>;
+			wr-on = <10>;
+			wr-off = <30>;
+			rd-on = <10>;
+			rd-off = <30>;
+			chip-delay = <30>;	/* delay in us */
+		};
+	};
+};

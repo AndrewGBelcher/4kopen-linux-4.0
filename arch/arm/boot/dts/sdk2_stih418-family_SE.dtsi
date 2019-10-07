@@ -1,0 +1,155 @@
+/*
+ * Copyright (C) 2013 STMicroelectronics Limited.
+ * Author(s): Giuseppe Condorelli <giuseppe.condorelli@st.com>
+ *            Carmelo Amoroso <carmelo.amoroso@st.com>
+ *            Giuseppe Cavallaro <peppe.cavallaro@st.com>
+ *            Nunzio Raciti <nunzio.raciti@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * publishhed by the Free Software Foundation.
+ */
+#if defined (CONF_MAP_2GB) || defined (CONF_MAP_1_5GB)
+	#define HADES_FW_ADDR 0x80A00000
+#elif defined (CONF_MAP_3GB)
+	#define HADES_FW_ADDR 0x40A00000
+#elif defined (CONF_MAP_1GB)
+	#define HADES_FW_ADDR 0xA0A00000
+#else
+	#error DDR config (1GB, 1_5GB, 2GB or 3GB) not defined
+#endif
+
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+       #define HADES_FW_NAME "hades_fw_cannes25c2.bin"
+#else
+       #define HADES_FW_NAME "hades_fw_cannes25.bin"
+#endif
+
+#if defined (CONF_SOC_h418) || defined (CONF_SOC_h318) || defined (CONF_SOC_h414) || defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+	#define CLK_PP_DMU_RATE 240000000
+#else
+	#define CLK_PP_DMU_RATE 300000000
+#endif
+	#define CLK_HWPE_HADES_RATE 400000000
+#elif defined (CONF_SOC_h314)
+	#define CLK_PP_DMU_RATE 266250000
+	#define CLK_HWPE_HADES_RATE 355300000
+#else
+	#error SOC config (h418/h414/h318/h314/h419/h319) not defined
+#endif
+
+
+/ {
+
+	soc {
+
+			h264pp {
+			compatible = "st,se-h264pp";
+			status = "okay";
+			reg = <0x8C00000 0x1FFFF>;
+			reg-names = "regs1";
+			interrupts = <0 53 0>;
+			clock-frequency = <CLK_PP_DMU_RATE>;
+			interrupt-names = "its1";
+			stbus-opc-size = <5>;
+			stbus-chunk-size = <0>;
+			stbus-msg-size = <3>;
+			clock-names = "clk_h264pp_0";
+			clocks = <&CLK_S_C0_FLEXGEN CLK_PP_DMU>;
+			power-domains = <&delta_core>;
+		};
+
+		vp8 {
+			compatible = "st,se-hx170";
+			status = "okay";
+			reg = <0x8C80000 0x3FFF>;
+			reg-names = "regs";
+			interrupts = <0 57 0>;
+			clock-frequency = <329500050>;
+			interrupt-names = "its";
+			clock-names = "clk_vp8";
+			clocks = <&CLK_S_C0_FLEXGEN CLK_TX_ICN_DMU>;
+		};
+
+#if defined (CONFIG_AVC)
+		h264encoder {
+			compatible = "st,se-hva";
+			status = "okay";
+			clock-frequency = <300000000>;
+			reg = <0x8C85000 0xFFF>,
+				<0x6000000 0x3FFFF>;
+			reg-names = "hva_registers", "hva_esram";
+			interrupts = <0 58 0>, <0 59 0>;
+			interrupt-names = "hva_its_irq", "hva_err_irq";
+			clock-names = "clk_hva";
+			clocks = <&CLK_S_C0_FLEXGEN CLK_HVA>;
+			power-domains = <&hva_core>;
+		};
+
+		hva@8c85000 {
+			compatible = "st,hva";
+			status = "okay";
+			clock-frequency = <300000000>;
+			reg = <0x8C85000 0xFFF>,
+				<0x6000000 0x3FFFF>;
+			reg-names = "hva_registers", "hva_esram";
+			interrupts = <0 58 0>, <0 59 0>;
+			interrupt-names = "hva_its_irq", "hva_err_irq";
+			clock-names = "clk_hva";
+			clocks = <&CLK_S_C0_FLEXGEN CLK_HVA>;
+			power-domains = <&hva_core>;
+		};
+#endif
+
+		hadespp {
+			compatible = "st,se-hadespp";
+			status = "okay";
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+			clock-frequency = <200000000 100000000>;
+#else
+			clock-frequency = <240000000 100000000>;
+#endif
+			reg = <0xA000000 0x3800>, <0xA003800 0x3800>;
+			reg-names = "hadespp1_registers", "hadespp2_registers";
+			interrupts = <0 78 0>, <0 80 0>;
+			interrupt-names = "hadespp1_irq", "hadespp2_irq";
+			clock-names = "clk_hevc_pp", "clk_avsp_pp";
+			clocks = <&CLK_S_C0_FLEXGEN CLK_PP_HEVC>,
+			         <&CLK_S_C0_FLEXGEN CLK_AVSP_HEVC>;
+			power-domains = <&hades_core>;
+		};
+
+		hades {
+			compatible = "st,se-hades";
+			status = "okay";
+			reg = <0xA010000 0x6F0000>;
+			clock-frequency = <CLK_HWPE_HADES_RATE 332999958>;
+			reg-names = "hades_registers";
+			interrupts = <0 75 0>, <0 76 0>, <0 77 0>, <0 79 0>;
+			interrupt-names = "hades_gen_irq", "hades_err_irq",
+				"hades_mb_irq", "hades_rab_irq";
+			clock-names = "clk_hwpe_hades", "clk_fc_hades", "clk_tx_icn_hades";
+			clocks = <&CLK_S_C0_FLEXGEN CLK_HWPE_HADES>,
+				 <&CLK_S_C0_FLEXGEN CLK_FC_HADES>,
+				 <&CLK_S_C0_FLEXGEN CLK_TX_ICN_HADES>;
+                        firmware = HADES_FW_NAME;
+			firmware-addr = <HADES_FW_ADDR>;
+			power-domains = <&hades_core>;
+		};
+
+#if defined (CONFIG_VP9)
+		vp9 {
+			compatible = "st,se-hx_170";
+			status = "okay";
+			reg = <0xAE00000 0xFFFFF>;
+			reg-names = "vp9_regs";
+			interrupts = <0 60 0>;
+			clock-frequency = <533000000>;
+			interrupt-names = "vp9_its_irq";
+			clock-names = "clk_vp9";
+			clocks = <&CLK_S_D2_FLEXGEN CLK_VP9>;
+		};
+#endif
+	};
+};

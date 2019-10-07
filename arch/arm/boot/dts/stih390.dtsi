@@ -1,0 +1,910 @@
+/*
+ * Copyright (C) 2015 STMicroelectronics Limited.
+ * Author: Guillaume Kouadio Carry <guillaume.kouadio-carry@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include "stih390-pinctrl.dtsi"
+#include <dt-bindings/reset-controller/stih390-resets.h>
+#include "stih390-clock.dtsi"
+#include "stih390-clks-refs.h"
+#include <dt-bindings/phy/usb2_xphy.h>
+#include <dt-bindings/st/flashss.h>
+/ {
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a9";
+			reg = <0>;
+			clock-frequency = <1500000000>;
+		};
+		cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a9";
+			reg = <1>;
+			clock-frequency = <1500000000>;
+		};
+	};
+
+	intc: interrupt-controller@26101000 {
+		compatible = "arm,cortex-a9-gic";
+		#interrupt-cells = <3>;
+		interrupt-controller;
+		reg = <0x26101000 0x1000>,
+		      <0x26100100 0x100>;
+	};
+
+	timer@26100200 {
+		interrupt-parent = <&intc>;
+		compatible = "arm,cortex-a9-global-timer";
+		reg = <0x26100200 0x100>;
+		interrupts = <GIC_PPI 11 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&CLK_TIMER_A9>;
+	};
+
+	soc {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		interrupt-parent = <&intc>;
+		ranges;
+		compatible = "simple-bus";
+
+		powerdown: powerdown-controller {
+			#reset-cells = <1>;
+			compatible = "st,stih390-powerdown";
+		};
+
+		softreset: softreset-controller {
+			#reset-cells = <1>;
+			compatible = "st,stih390-softreset";
+		};
+
+		/* Functional Cluster SYSCONF registers */
+
+		/*
+			This is the layout of the system config registers
+			available in each cluster that has 11 internal areas
+			organized as shown below:
+
+			o 2MiB of sysconfig area
+				RESET/Clock Gating	-> FC_ID*1000+[0-15]
+				RESERVED		-> FC_ID*1000+[100-199]
+				RESERVED		-> FC_ID*1000+[200-299]
+				PANIC_CTRL		-> FC_ID*1000+[300-399]
+				SPECIFIC		-> FC_ID*1000+[400-499]
+				POWER_CTRL		-> FC_ID*1000+[500-599]
+				RESERVED		-> FC_ID*1000+[600-699]
+				NOC_A1			-> FC_ID*1000+[700-799]
+
+			o Sysconf area starts @0x1000000 from the FC memory
+				For instance, FC1 VSAFE baseAddr is  0xa000000
+				So, syscfg_fc1_vsafe starts @
+				0xa000000 + 0x1000000 = 0xb000000
+		*/
+
+		/* FC0 BACKBONE Syscfg 0-799 */
+		syscfg_fc0_backbone: fc0-backbone-syscfg@9000000 {
+			compatible = "st,stih390-syscfg-fc0-backbone", "syscon";
+			reg = <0x9000000 0x200000>;
+		};
+
+		/* FC1 VSAFE Syscfg 1000-1799 */
+		syscfg_fc1_vsafe: fc1-vsafe-syscfg@b000000 {
+			compatible = "st,stih390-syscfg-fc1-vsafe", "syscon";
+			reg = <0xb000000 0x200000>;
+		};
+
+		/* FC2 WIFI Syscfg 2000-2799 */
+		syscfg_fc2_wifi: fc2-wifi-syscfg@d000000 {
+			compatible = "st,stih390-syscfg-fc2-wifi", "syscon";
+			reg = <0xd000000 0x200000>;
+		};
+
+		/* FC3 VDEC Syscfg 3000-3799 */
+		syscfg_fc3_vdec: fc3-vdec-syscfg@f000000 {
+			compatible = "st,stih390-syscfg-fc3-vdec", "syscon";
+			reg = <0xf000000 0x200000>;
+		};
+
+		/* FC 4,5 RESERVED */
+
+		/* FC6 DISPLAY Syscfg 6000-6799 */
+		syscfg_fc6_display: fc6-display-syscfg@15000000 {
+			compatible = "st,stih390-syscfg-fc6-display", "syscon";
+			reg = <0x15000000 0x200000>;
+		};
+
+		/* FC7 HSIF Syscfg 7000-7799 */
+		syscfg_fc7_hsif: fc7-hsif-syscfg@17000000 {
+			compatible = "st,stih390-syscfg-fc7-hsif", "syscon";
+			reg = <0x17000000 0x200000>;
+		};
+
+		/* FC 8 RESERVED */
+
+		/* FC9 ST231SS Syscfg 9000-9799 */
+		syscfg_fc9_st231ss: fc9-st231ss-syscfg@1b000000 {
+			compatible = "st,stih390-syscfg-fc9-st231ss", "syscon";
+			reg = <0x1b000000 0x200000>;
+		};
+
+		/* FC10 GPU Syscfg 10000-10799 */
+		syscfg_fc10_gpu: fc10-gpu-syscfg@1d000000 {
+			compatible = "st,stih390-syscfg-fc10-gpu", "syscon";
+			reg = <0x1d000000 0x200000>;
+		};
+
+		/* FC11 BOOTDEV Syscfg 11000-11799 */
+		syscfg_fc11_bootdev: fc11-bootdev-syscfg@1f000000 {
+			compatible = "st,stih390-syscfg-fc11-bootdev", "syscon";
+			reg = <0x1f000000 0x200000>;
+		};
+
+		/* FC12 RESERVED */
+
+		/* FC13 TS Syscfg 13000-13799 */
+		syscfg_fc13_ts: fc13-ts-syscfg@23000000 {
+			compatible = "st,stih390-syscfg-fc13-ts", "syscon";
+			reg = <0x23000000 0x200000>;
+		};
+
+		/* FC14 RESERVED */
+
+		/* FC15 A9 Syscfg 15000-15799 */
+		syscfg_a9: fc15-a9-syscfg@27000000 {
+			compatible = "st,stih390-syscfg-fc15-a9", "syscon";
+			reg = <0x27000000 0x200000>;
+		};
+
+		/* SYSCONF PIO mux registers */
+
+		/* SYSCONF for PIOmuxing */
+
+		syscfg_pio_front_0: pio-front0-syscfg@08300000 {
+			compatible = "st,stih390-pio-front0-syscfg", "syscon";
+			reg = <0x8300000 0x1000>;
+		};
+
+
+		syscfg_pio_front_1: pio-front1-syscfg@08310000 {
+			compatible = "st,stih390-pio-front1-syscfg", "syscon";
+			reg = <0x8310000 0x1000>;
+		};
+
+		syscfg_pio_rear_0: pio-rear0-syscfg@08320000 {
+			compatible = "st,stih390-pio-rear0-syscfg", "syscon";
+			reg = <0x8320000 0x1000>;
+		};
+
+		syscfg_pio_vsafe: pio-vsafe-syscfg@0a600000 {
+			compatible = "st,stih390-pio-vsafe-syscfg", "syscon";
+			reg = <0x0a600000 0x100000>;
+		};
+
+		syscfg_pio_flash: pio-flash-syscfg@1e400000 {
+			compatible = "st,stih390-pio-flash-syscfg", "syscon";
+			reg = <0x1e400000 0x1000>;
+		};
+
+		/* PERIPHERALS IPs */
+
+		/* UART_0 COMMS_FRONT0*/
+		serial0: serial0@08930000 {
+			compatible = "st,asc";
+			status = "disabled";
+			reg = <0x08930000 0x2c>;
+			interrupts = <GIC_SPI 122 IRQ_TYPE_NONE>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_front0_serial0>;
+			clocks = <&CLK_PERIPH_TS>;
+		};
+		/* UART_1 COMMS_FRONT0*/
+		serial1: serial1@08931000 {
+			compatible = "st,asc";
+			status = "disabled";
+			reg = <0x08931000 0x2c>;
+			interrupts = <GIC_SPI 123 IRQ_TYPE_NONE>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_front0_serial1_alt2_0>;
+			clocks = <&CLK_PERIPH_TS>;
+		};
+
+		/* UART_2 COMMS_FRONT0*/
+		serial2: serial2@089320000 {
+			compatible = "st,asc";
+			status = "disabled";
+			reg = <0x08932000 0x2c>;
+			interrupts = <GIC_SPI 124 IRQ_TYPE_NONE>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_front0_serial2_alt2_0>;
+			clocks = <&CLK_PERIPH_TS>;
+		};
+
+		i2c0: i2c0@08940000 {
+			compatible = "st,comms-ssc4-i2c";
+			status = "disabled";
+			reg = <0x08940000 0x110>;
+			interrupts = <GIC_SPI 114 IRQ_TYPE_NONE>;
+			clocks = <&CLK_PERIPH_TS>;
+			clock-names = "ssc";
+			clock-frequency = <400000>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_front0_i2c0_alt3_0>;
+		};
+
+		spi0: spi0@08940000 {
+			compatible = "st,comms-ssc-spi";
+			status = "disabled";
+			reg = <0x08940000 0x110>;
+			interrupts = <GIC_SPI 114 IRQ_TYPE_NONE>;
+			clocks = <&CLK_PERIPH_TS>;
+			clock-names = "ssc";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_front0_spi0_4w_alt3_0>;
+		};
+
+		spi1: spi1@08941000 {
+			compatible = "st,comms-ssc-spi";
+			status = "disabled";
+			reg = <0x08941000 0x110>;
+			interrupts = <GIC_SPI 115 IRQ_TYPE_NONE>;
+			clocks = <&CLK_PERIPH_TS>;
+			clock-names = "ssc";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_front0_spi1_4w_alt3_0>;
+		};
+
+		spi2: spi2@08942000 {
+			compatible = "st,comms-ssc-spi";
+			status = "disabled";
+			reg = <0x08942000 0x110>;
+			interrupts = <GIC_SPI 116 IRQ_TYPE_NONE>;
+			clocks = <&CLK_PERIPH_TS>;
+			clock-names = "ssc";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_front0_spi2_4w_alt2_0>;
+		};
+
+		spi3: spi3@08943000 {
+			compatible = "st,comms-ssc-spi";
+			status = "disabled";
+			reg = <0x08943000 0x110>;
+			interrupts = <GIC_SPI 117 IRQ_TYPE_NONE>;
+			clocks = <&CLK_PERIPH_TS>;
+			clock-names = "ssc";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_front0_spi3_4w_alt2_0>;
+		};
+
+		/* UART_3 COMMS_REAR0*/
+		serial3: serial3@08a30000 {
+			compatible = "st,asc";
+			status = "disabled";
+			reg = <0x08a30000 0x2c>;
+			interrupts = <GIC_SPI 125 IRQ_TYPE_NONE>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_rear0_serial3_alt1_0>;
+			clocks = <&CLK_PERIPH_DISP>;
+		};
+
+		/* Synopsys GMAC */
+		ethernet0: dwmac@16900000 {
+			device_type = "network";
+			status = "disabled";
+			compatible = "st,stih390-dwmac", "snps,dwmac-4.00";
+
+			reg-names = "stmmaceth", "sti-ethconf", "sti-clkconf";
+			reg = <0x16900000 0x8000>, <0x13002c 0x4>,
+			      <0x130030 0x4>;
+
+			interrupt-names = "macirq", "eth_wake_irq", "eth_lpi";
+			interrupts = <GIC_SPI 218 IRQ_TYPE_NONE>,
+				     <GIC_SPI 219 IRQ_TYPE_NONE>,
+				     <GIC_SPI 220 IRQ_TYPE_NONE>;
+
+			st,syscon = <&syscfg_fc7_hsif>;
+			st,gmac_en;
+
+			resets = <&softreset STIH390_FC7_GMAC_SOFTRESET>;
+			reset-names = "stmmaceth";
+
+			pinctrl-names = "default";
+
+			clock-names = "stmmaceth", "sti-ethclk";
+			clocks = <&CLK_PERIPH_DISP>, <&CLK_ETH_GMAC_S>;
+
+			power-domains = <&gmac_hsif>;
+		};
+
+		ethernet1: dwmac@c600000 {
+			device_type = "network";
+			status = "disabled";
+			compatible = "st,stih390-dwmac", "snps,dwmac-4.00";
+
+			reg-names = "stmmaceth", "sti-ethconf";
+			reg = <0xc600000 0x100000>, <0x200 0x4>;
+
+			interrupt-names = "macirq", "eth_wake_irq", "eth_lpi";
+			interrupts = <GIC_SPI 179 IRQ_TYPE_NONE>,
+				     <GIC_SPI 180 IRQ_TYPE_NONE>,
+				     <GIC_SPI 181 IRQ_TYPE_NONE>;
+
+			st,syscon = <&syscfg_fc2_wifi>;
+			st,gmac_en;
+
+			resets = <&softreset STIH390_FC2_GMAC_W_0_SOFTRESET>;
+			reset-names = "stmmaceth";
+
+			pinctrl-names = "default";
+
+			clock-names = "stmmaceth", "sti-ethclk";
+			clocks = <&CLK_PERIPH_WIFI>, <&CLK_ETH_GMAC_W>;
+
+			power-domains = <&gmacw_wifi>;
+		};
+		spi5: spi5@08a40000 {
+			compatible = "st,comms-ssc-spi";
+			status = "disabled";
+			reg = <0x08a40000 0x110>;
+			interrupts = <GIC_SPI 118 IRQ_TYPE_NONE>;
+			clocks = <&CLK_PERIPH_DISP>;
+			clock-names = "ssc";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_rear0_spi5_4w_alt1_0>;
+		};
+
+		spi6: spi6@08a41000 {
+			compatible = "st,comms-ssc-spi";
+			status = "disabled";
+			reg = <0x08a41000 0x110>;
+			interrupts = <GIC_SPI 119 IRQ_TYPE_NONE>;
+			clocks = <&CLK_PERIPH_DISP>;
+			clock-names = "ssc";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_rear0_spi6_4w_alt1_0>;
+		};
+
+		i2c6: i2c6@08a41000 {
+			compatible = "st,comms-ssc4-i2c";
+			status = "disabled";
+			reg = <0x08a41000 0x110>;
+			interrupts = <GIC_SPI 119 IRQ_TYPE_NONE>;
+			clocks = <&CLK_PERIPH_DISP>;
+			clock-names = "ssc";
+			clock-frequency = <400000>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_rear0_i2c6_alt1_0>;
+		};
+
+		temp0{
+			compatible = "st,stih407-thermal";
+			reg = <0x0A900000 0x28>;
+			clock-names = "thermal";
+			clocks = <&CLK_SYSIN>;
+			interrupts = <GIC_SPI 72 IRQ_TYPE_EDGE_RISING>;
+			st,passive_cooling_temp = <110>;
+		};
+
+		pwm0: pwm0@08a10000 {
+			compatible = "st,sti-pwm";
+			status = "disabled";
+			#pwm-cells = <2>;
+			reg = <0x08a10000 0x68>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_rear0_pwm0
+				     &pinctrl_rear0_pwm1
+				     &pinctrl_rear0_pwm2
+				     &pinctrl_rear0_pwm3>;
+			clock-names = "pwm";
+			clocks = <&CLK_PWM>;
+			st,pwm-num-chan = <4>;
+		};
+
+		/* VSAFE */
+		serial10: serial10@0a1a0000 {
+			compatible = "st,asc";
+			status = "disabled";
+			reg = <0x0a1a0000 0x2c>;
+			interrupts = <GIC_SPI 140 IRQ_TYPE_NONE>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_vsafe_serial10_alt1_0>;
+			clocks = <&CLK_SYSIN>;
+		};
+
+		serial11: serial11@0a1b0000 {
+			compatible = "st,asc";
+			status = "disabled";
+			reg = <0x0a1b0000 0x2c>;
+			interrupts = <GIC_SPI 141 IRQ_TYPE_NONE>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_vsafe_serial11_alt2_0>;
+			clocks = <&CLK_SYSIN>;
+		};
+
+		spi10: spi10@0a1c0000 {
+			compatible = "st,comms-ssc-spi";
+			status = "disabled";
+			reg = <0x0a1c0000 0x110>;
+			interrupts = <GIC_SPI 137 IRQ_TYPE_NONE>;
+			clocks = <&CLK_SYSIN>;
+			clock-names = "ssc";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_vsafe_spi10_4w_alt1_0>;
+		};
+
+		spi11: spi11@0a1d0000 {
+			compatible = "st,comms-ssc-spi";
+			status = "disabled";
+			reg = <0x0a1d0000 0x110>;
+			interrupts = <GIC_SPI 138 IRQ_TYPE_NONE>;
+			clocks = <&CLK_SYSIN>;
+			clock-names = "ssc";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_vsafe_spi11_3w_alt1_0>;
+		};
+
+		i2c11: i2c11@0a1d0000 {
+			compatible = "st,comms-ssc4-i2c";
+			status = "disabled";
+			reg = <0x0a1d0000 0x110>;
+			interrupts = <GIC_SPI 138 IRQ_TYPE_NONE>;
+			clocks = <&CLK_SYSIN>;
+			clock-names = "ssc";
+			clock-frequency = <400000>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_vsafe_i2c11_alt1_0>;
+		};
+
+
+		i2c12: i2c12@0a1e0000 {
+			compatible = "st,comms-ssc4-i2c";
+			status = "disabled";
+			reg = <0x0a1e0000 0x110>;
+			interrupts = <GIC_SPI 139 IRQ_TYPE_NONE>;
+			clocks = <&CLK_SYSIN>;
+			clock-names = "ssc";
+			clock-frequency = <400000>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_vsafe_i2c12_alt2_0>;
+		};
+
+		spi12: spi12@0a1e0000 {
+			compatible = "st,comms-ssc-spi";
+			status = "disabled";
+			reg = <0x0a1e0000 0x110>;
+			interrupts = <GIC_SPI 139 IRQ_TYPE_NONE>;
+			clocks = <&CLK_SYSIN>;
+			clock-names = "ssc";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_vsafe_spi12_4w_alt1_0>;
+		};
+
+		pwm10: pwm10@0a160000 {
+			compatible = "st,sti-pwm";
+			status = "disabled";
+			#pwm-cells = <2>;
+			reg = <0x0a160000 0x68>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_vsafe_pwm10>;
+			clock-names = "pwm";
+			clocks = <&CLK_SYSIN>;
+			st,pwm-num-chan = <1>;
+		};
+
+		pwm11: pwm11@0a170000 {
+			compatible = "st,sti-pwm";
+			status = "disabled";
+			#pwm-cells = <2>;
+			reg = <0x0a170000 0x68>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_vsafe_pwm11>;
+			clock-names = "pwm";
+			clocks = <&CLK_SYSIN>;
+			st,pwm-num-chan = <1>;
+		};
+
+		pwm12: pwm12@0a180000 {
+			compatible = "st,sti-pwm";
+			status = "disabled";
+			#pwm-cells = <2>;
+			reg = <0x0a180000 0x68>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_vsafe_pwm12>;
+			clock-names = "pwm";
+			clocks = <&CLK_SYSIN>;
+			st,pwm-num-chan = <1>;
+		};
+
+		keyscan: pinctrl_keyscan@0a110000 {
+			compatible = "st,keypad";
+			status = "disabled";
+			reg = <0x0a110000 0x2000>;
+			interrupts = <GIC_SPI 143 IRQ_TYPE_NONE>;
+			clocks = <&CLK_SYSIN>;
+			pinctrl-names = "default";
+		};
+		/* FlashSS*/
+		/* Supply voltage for I/O */
+		vqmmc_reg: voltage-regulator {
+			compatible = "st,vqmmc";
+			regulator-name = "vqmmc0";
+			/* Control register for the VSENSE Module */
+			reg = <0x1e301804 0x4>;
+			status = "disabled";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
+
+		mmc0: sdhci@1e300000 {
+			compatible = "st,sdhci";
+			status = "disabled";
+			reg = <0x1e300000 0x800>, <0x1e301808 0x20>;
+			reg-names = "mmc", "top-mmc-delay";
+			interrupts = <GIC_SPI 92 IRQ_TYPE_NONE>;
+			interrupt-names = "mmcirq";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_emmc0>;
+			clocks = <&CLK_MMC_0>;
+			clock-names = "mmc";
+			resets = <&softreset STIH390_FC11_SDEMMC_0_SOFTRESET>;
+			st,mmcss-config;
+			st,flashss-version = <FLASHSS_CORE_VERSION_3_0>;
+			vqmmc-supply = <&vqmmc_reg>;
+			power-domains = <&emmc_bootdev>;
+		};
+
+		mmc1: sdhci@1e600000 {
+			compatible = "st,sdhci";
+			status = "disabled";
+			reg = <0x1e600000 0x800>;
+			reg-names = "mmc";
+			interrupts = <GIC_SPI 88 IRQ_TYPE_NONE>;
+			interrupt-names = "mmcirq";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_sd1>;
+			clocks = <&CLK_MMC_1>;
+			clock-names = "mmc";
+			st,mmcss-config;
+			power-domains = <&sdemmc0_bootdev>;
+		};
+
+		usb2_0: usb@16200000 {
+			compatible = "st,usb-300x";
+			status = "disabled";
+			reg = <0x16203c00 0x100>, <0x16203e00 0x100>;
+			reg-names = "ohci", "ehci";
+
+			interrupts = <GIC_SPI 177 IRQ_TYPE_NONE>,
+				     <GIC_SPI 178 IRQ_TYPE_NONE>;
+			interrupt-names = "ehci","ohci";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_rear0_usb2_0>;
+			clocks = <&CLK_ICN_DISP>;
+			clock-names = "ic";
+
+			resets = <&powerdown STIH390_FC7_USB2_0_POWERDOWN_REQ>,
+				 <&softreset STIH390_FC7_USB2_RESET>;
+			reset-names = "power", "softreset";
+
+			phys = <&usb2_0_xphy0>;
+			phy-names = "usb2-phy";
+
+			power-domains = <&usb2_hsif>;
+		};
+
+		usb2_0_xphy0: usb2xphy@0 {
+			compatible = "st,usb2-xphy", "st,stih390-usb2-xphy";
+			#phy-cells = <0>;
+
+			st,syscfg = <&syscfg_fc7_hsif>;
+			reg = <0x16100084 0x8>, <0x0130014 0x4>;
+			reg-names = "xphy-glue", "syscfg-usbss";
+
+			resets = <&softreset STIH390_FC7_USB2_PHY_RESET>;
+			clocks = <&CLK_SYSIN>;
+			clock-names = "osc_phy";
+
+			st,usbxss-xphy-ctrl;
+			st,usbxss = <ST_USB2SS>;
+		};
+
+		usb2_0_xphy1: usb2xphy@1 {
+			compatible = "st,usb2-xphy";
+			#phy-cells = <0>;
+
+			st,syscfg = <&syscfg_fc7_hsif>;
+			reg = <0x16100048 0x10>, <0x0130014 0x4>;
+			reg-names = "xphy-glue", "syscfg-usbss";
+
+			resets = <&softreset STIH390_FC7_USB3_PHY_USB2_RESET>;
+			clocks = <&CLK_SYSIN>;
+			clock-names = "osc_phy";
+
+			st,usbxss-xphy-ctrl;
+			st,usbxss = <ST_USB3SS>;
+		};
+
+		dwc3_0_usb3_phy: usb3_phy@0 {
+			compatible = "st,sti-usb3phy";
+			#phy-cells = <0>;
+			reg = <0x16140000 0xff>, <0x16145000 0xff>;
+			reg-names = "usb3-uport", "pipew";
+			st,syscfg = <&syscfg_fc7_hsif>;
+		};
+
+		st_dwc3_0_glue: dwc3@16100000 {
+			status = "disabled";
+			compatible = "st,stih390-dwc3";
+			reg = <0x16100000 0x3c>;
+			reg-names = "reg-glue";
+			resets = <&powerdown STIH390_FC7_USB3_0_POWERDOWN_REQ>,
+				 <&softreset STIH390_FC7_USB3_RESET>;
+			reset-names = "power", "soft";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_rear0_usb3_0>;
+			ranges;
+
+			power-domains = <&usb3_hsif>;
+
+			dwc3_0: dwc3@16000000 {
+				compatible = "synopsys,dwc3";
+				reg = <0x16000000 0x100000>;
+				interrupts = <GIC_SPI 166 IRQ_TYPE_NONE>;
+
+				phys = <&usb2_0_xphy1>;
+				phy-names = "usb2-phy";
+
+				usb3-phy = <&dwc3_0_usb3_phy>;
+			};
+		};
+
+		fdma0: fdma0@0 {
+			compatible = "st,fdma_mpe31";
+			reg = <0x14600000 0x20000>;
+			interrupts = <GIC_SPI 3 IRQ_TYPE_NONE>;
+			dma-channels = <16>;
+			#dma-cells = <3>;
+			st,fw-name = "fdma_STiH390_0.elf";
+			clocks = <&CLK_SLIM_FDMA_0>,
+				 <&CLK_ICN_DISP>,
+				 <&CLK_ICN_DISP>,
+				 <&CLK_PERIPH_DISP>;
+			clock-names = "fdma_slim",
+				      "fdma_hi",
+				      "fdma_low",
+				      "fdma_ic";
+		};
+
+		fdma1: fdma1@1 {
+			compatible = "st,fdma_mpe31";
+			reg = <0x14620000 0x20000>;
+			interrupts = <GIC_SPI 5 IRQ_TYPE_NONE>;
+			dma-channels = <16>;
+			#dma-cells = <3>;
+			st,fw-name = "fdma_STiH390_1.elf";
+			clocks = <&CLK_SLIM_FDMA_1>,
+				 <&CLK_ICN_DISP>,
+				 <&CLK_ICN_DISP>,
+				 <&CLK_PERIPH_DISP>;
+			clock-names = "fdma_slim",
+				      "fdma_hi",
+				      "fdma_low",
+				      "fdma_ic";
+		};
+
+		/* uniperipheral players */
+		/* due to PIO mux, if you configure player0 with 8 channels, */
+		/* then you cannot enable reader0, and vice versa */
+		snd_uni_player0: snd-uni-player@0 {
+			compatible = "st,uni_player";
+			status = "disabled";
+			reg = <0x14700000 0x158>;
+			interrupts = <GIC_SPI 78 IRQ_TYPE_NONE>;
+			version = <5>;
+			dmas = <&fdma0 12 0 1>;
+			dma-names = "tx";
+			description = "Uni Player #0 (PIO)";
+			card-device = <0>;
+			mode = "PCM";
+			channels = <8>;
+			standby = <1>;
+			underflow = <1>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_i2s_2ch_out>;
+			clocks = <&CLK_PCM_0>;
+			clock-names = "uni_player_clk";
+			auto-suspend-delay = <5000>;
+		};
+
+		snd_uni_player1: snd-uni-player@1 {
+			compatible = "st,uni_player";
+			status = "disabled";
+			reg = <0x14710000 0x158>;
+			interrupts = <GIC_SPI 79 IRQ_TYPE_NONE>;
+			version = <5>;
+			dmas = <&fdma0 2 0 1>;
+			dma-names = "tx";
+			description = "Uni Player #1 (HDMI)";
+			card-device = <1>;
+			mode = "HDMI";
+			iec958-lr-pol = <0>;
+			iec958-i2s-mode = <0>;
+			channels = <8>;
+			standby = <1>;
+			underflow = <1>;
+			clocks = <&CLK_PCM_1>;
+			clock-names = "uni_player_clk";
+			mclk_oversampling = <128>;
+			auto-suspend-delay = <5000>;
+			resets = <&softreset STIH390_FC6_UPLAYER_1_SOFTRESET>;
+			reset-names = "player-rst";
+			power-domains = <&uplayer1_display>;
+		};
+
+		snd_uni_player2: snd-uni-player@2 {
+			compatible = "st,uni_player";
+			status = "disabled";
+			reg = <0x14720000 0x158>;
+			interrupts = <GIC_SPI 80 IRQ_TYPE_NONE>;
+			version = <5>;
+			dmas = <&fdma0 3 0 1>;
+			dma-names = "tx";
+			description = "Uni Player #2 (DAC)";
+			card-device = <2>;
+			mode = "PCM";
+			channels = <2>;
+			standby = <1>;
+			underflow = <1>;
+			s16-swap-lr = <1>;
+			clocks = <&CLK_PCM_2>;
+			clock-names = "uni_player_clk";
+			mclk_oversampling = <256>;
+			auto-suspend-delay = <5000>;
+			resets = <&softreset STIH390_FC6_UPLAYER_2_SOFTRESET>;
+			reset-names = "player-rst";
+			power-domains = <&uplayer2_display>;
+		};
+
+		snd_uni_player3: snd-uni-player@3 {
+			compatible = "st,uni_player";
+			status = "disabled";
+			reg = <0x14730000 0x158>;
+			interrupts = <GIC_SPI 81 IRQ_TYPE_NONE>;
+			version = <5>;
+			dmas = <&fdma0 7 0 1>;
+			dma-names = "tx";
+			description = "Uni Player #3 (SPDIF)";
+			iec958-lr-pol = <0>;
+			iec958-i2s-mode	= <1>;
+			card-device = <3>;
+			mode = "SPDIF";
+			channels = <2>;
+			standby = <1>;
+			underflow = <1>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_spdif_out>;
+			clocks = <&CLK_SPDIF>;
+			clock-names = "uni_player_clk";
+			auto-suspend-delay = <5000>;
+			resets = <&softreset STIH390_FC6_UPLAYER_3_SOFTRESET>;
+			reset-names = "player-rst";
+			power-domains = <&uplayer3_display>;
+		};
+
+		snd_uni_reader0: snd-uni-reader@0 {
+			compatible = "st,uni_reader";
+			status = "disabled";
+			reg = <0x14740000 0x158>;
+			interrupts = <GIC_SPI 76 IRQ_TYPE_NONE>;
+			version = <3>;
+			dmas = <&fdma0 13 0 1>;
+			dma-names = "rx";
+			description = "Uni Reader #0 (SPDIF)";
+			card-device = <4>;
+			channels = <8>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_i2s_2ch_in>;
+		};
+
+		/* uniperipheral readers */
+		snd_uni_reader1: snd-uni-reader@1 {
+			compatible = "st,uni_reader";
+			status = "disabled";
+			reg = <0x14750000 0x158>;
+			interrupts = <GIC_SPI 77 IRQ_TYPE_NONE>;
+			version = <3>;
+			dmas = <&fdma0 9 0 1>;
+			dma-names = "rx";
+			description = "Uni Reader #1 (HDMI)";
+			card-device = <5>;
+			channels = <8>;
+			resets = <&softreset STIH390_FC6_UREADER_1_SOFTRESET>;
+			reset-names = "reader-rst";
+			power-domains = <&ureader1_display>;
+		};
+
+		sti_audio_clk_glue: sti-audio-clk-glue {
+			st,syscfg = <&syscfg_fc6_display>;
+			reg-offset = <0x0013000c>;
+			bit-offset = <8>;
+		};
+
+		hdmi_formater:hdmi_fformat@14404000 {
+			compatible = "st,stih390-hdmi_fformat", "syscon";
+			reg = <0x14404000 0x1000>;
+			holes = <0x14 0x8
+				 0x24 0xdc
+				 0x130 0xd0
+				 0x208 0x8
+				 0x240 0x4
+				 0x24c 0xb8
+				 0x324 0xdc
+				 0x408 0xf8
+				 0x508 0x8
+				 0x514 0x4
+				 0x51c 0x4
+				 0x528 0xd8
+				 0x6a0 0x960>;
+		};
+
+		/* ASOC codecs */
+		sti_sasg_codec: sti-sasg-codec {
+			compatible = "st,stih390-sas-codec";
+			status = "okay";
+			st,reg_audio = <&syscfg_fc6_display>;
+			st,reg_hdmi_ff = <&hdmi_formater>;
+			resets = <&softreset STIH390_FC6_HDTVOUT_0_SOFTRESET>;
+			interrupts = <GIC_SPI 106 IRQ_TYPE_NONE>;
+		};
+
+		/* ASOC platform */
+		sti_asoc_platform: sti-asoc-platform {
+			compatible = "st,sti-asoc-platform";
+			status = "okay";
+			st,mem-partition-name = "audio";
+		};
+
+		nandbch: nand-bch {
+			compatible = "st,nand-bch-ip-plug";
+			status = "disabled";
+			reg = <0x6201000 0x1000>, <0x1e300800 0x1000>;
+			reg-names = "nand_mem", "nand_dma";
+			clocks = <&CLK_FLASH>, <&CLK_NAND>;
+			clock-names = "emi_clk", "bch_clk";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_nand>;
+			interrupts = <GIC_SPI 94 IRQ_TYPE_NONE>;
+			interrupt-names = "nand_irq";
+			st,bch-ecc-mode = "auto";
+			st,flex-select-reg = <0x1e301800>;
+			st,bch-select-msk = <0x1>;
+			power-domains = <&nand_bootdev>;
+		};
+
+		spisfc: spisfc@1e302000 {
+			compatible = "st,stih390-sfc-revc";
+			status = "disabled";
+			reg = <0x1e302000 0x1000>;
+			reg-names = "sfc_mem";
+			clocks = <&CLK_SPI>;
+			clock-names = "sfc_clk";
+			pinctrl-0 = <&pinctrl_sfc>;
+			pinctrl-names = "default";
+			interrupts = <GIC_SPI 97 IRQ_TYPE_NONE>;
+			interrupt-names = "sfc_irq";
+			st,syscfg = <&syscfg_fc0_backbone>;
+			power-domains = <&spi_bootdev>;
+		};
+	};
+};

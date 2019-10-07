@@ -1,0 +1,231 @@
+/*
+ * Copyright (C) 2013 STMicroelectronics Limited.
+ * Author(s): Giuseppe Condorelli <giuseppe.condorelli@st.com>
+ *            Carmelo Amoroso <carmelo.amoroso@st.com>
+ *            Giuseppe Cavallaro <peppe.cavallaro@st.com>
+ *            Nunzio Raciti <nunzio.raciti@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * publishhed by the Free Software Foundation.
+ */
+
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+#if defined (CONF_MAP_2GB) || defined (CONF_MAP_1_5GB)
+	#define TEE_FW_NAME "tee_firmware-stih419_gp0_2G.elf"
+	#define TEE_FW_RAM_BASE 0x80200000
+#elif defined (CONF_MAP_3GB)
+	#define TEE_FW_NAME "tee_firmware-stih419_gp0_3G.elf"
+	#define TEE_FW_RAM_BASE 0x40200000
+#elif defined (CONF_MAP_1GB)
+	#define TEE_FW_NAME "tee_firmware-stih419_gp0_1G.elf"
+	#define TEE_FW_RAM_BASE 0xA0200000
+#else
+	#error DDR config (1GB, 1_5GB, 2GB or 3GB) not defined
+#endif
+#else /* CONF_SOC_h418 || CONF_SOC_h318 */
+#if defined (CONF_MAP_2GB) || defined (CONF_MAP_1_5GB)
+	#define TEE_FW_NAME "tee_firmware-stih418_gp0_2G.elf"
+	#define TEE_FW_RAM_BASE 0x80200000
+#elif defined (CONF_MAP_3GB)
+	#define TEE_FW_NAME "tee_firmware-stih418_gp0_3G.elf"
+	#define TEE_FW_RAM_BASE 0x40200000
+#elif defined (CONF_MAP_1GB)
+	#define TEE_FW_NAME "tee_firmware-stih418_gp0_1G.elf"
+	#define TEE_FW_RAM_BASE 0xA0200000
+#else
+	#error DDR config (1GB, 1_5GB, 2GB or 3GB) not defined
+#endif
+#endif /* CONF_SOC_h418 || CONF_SOC_h318 */
+
+/*Changes for Remote Proc*/
+#define SECURE_BOOT_MEM_SIZE (0x200000)
+#define ST231_GP0_MEM_SIZE   (0x800000)
+#define HADES_MEM_SIZE       (0x200000)
+#define ST231_AUDIO_MEM_SIZE (0x800000)
+#define ST231_GP1_MEM_SIZE   (0x800000)
+#define ST231_DMU_MEM_SIZE   (0x400000)
+
+#define SECURE_BOOT_BASE_ADDR      PHYS_MEM_START
+#define ST231_GP0_MEM_BASE_ADDR    (SECURE_BOOT_BASE_ADDR + SECURE_BOOT_MEM_SIZE)
+#define HADES_MEM_BASE_ADDR        (ST231_GP0_MEM_BASE_ADDR + ST231_GP0_MEM_SIZE)
+#define ST231_AUDIO_MEM_BASE_ADDR  (HADES_MEM_BASE_ADDR + HADES_MEM_SIZE)
+#define ST231_GP1_MEM_BASE_ADDR    (ST231_AUDIO_MEM_BASE_ADDR + ST231_AUDIO_MEM_SIZE)
+#define ST231_DMU_MEM_BASE_ADDR    (ST231_GP1_MEM_BASE_ADDR + ST231_GP1_MEM_SIZE)
+
+/ {
+	aliases {
+		optee_st231_0 = &optee_st231_0;
+	};
+
+	soc {
+
+		/* SC resources */
+		cesc_config: cesc_config {
+			default-session-name = "default";
+		};
+
+		/* Tango-SC configuration */
+		cesc@09a20000 {
+			compatible = "st,tango-sc";
+			power-domains = <&stbe_core>;
+#ifndef CONFIG_TANGOSC
+			status = "disabled";
+#else
+			status = "okay";
+#endif
+			cesc_config = <&cesc_config>;
+			clocks = <&CLK_S_C0_FLEXGEN CLK_PROC_STFE>,
+				 <&CLK_S_C0_FLEXGEN CLK_PROC_SC>,
+				 <&CLK_S_C0_FLEXGEN CLK_PROC_TP>;
+
+			clock-names = "stfe_ccsc",
+				      "CLK_SC",
+				      "CLK_TP";
+
+			clocks_param {
+				clk0 {
+					clk-name = "stfe_ccsc";
+				};
+				clk1 {
+					clk-name = "CLK_SC";
+				};
+				clk2 {
+					clk-name = "CLK_TP";
+				};
+			};
+
+		};
+
+		smcs {
+			compatible = "st,smcs";
+			status = "okay";
+#ifdef CONF_SDP_SdpInactive
+			backend = <0>;
+#else
+			backend = <2>;
+#endif
+		};
+
+
+		mes@09000000 {
+			compatible = "st,mes3";
+			status = "okay";
+			reg		= <0x09000000 0x800>;
+			interrupts	= <0 22 0>;
+			interrupt-names	= "mes-int";
+			numregions	= <128>;
+		};
+
+		mes@0AA00000 {
+			compatible = "st,mes3";
+			status = "okay";
+			reg		= <0x0AA00000 0x800>;
+			interrupts	= <0 209 0>;
+			interrupt-names	= "mes-int";
+			numregions	= <128>;
+		};
+
+		optee_st231_0:st231sec@gp0 {
+			compatible =		"st,st231sec";
+			status =		"okay";
+			core_name =		"gp0";
+			conf =			<0x00000000>;
+			default_ctx =           <1>;
+
+			/* fimware configuration */
+			fw_name =		TEE_FW_NAME;
+			fw_ram_base =		<TEE_FW_RAM_BASE>;
+			fw_ram_size =		<0x00600000>;
+			fw_ram_max_size =	<0x00800000>;
+			ics_msgq_size =		<0x00040000>;
+#ifdef INCLUDE_SEC_DTS
+                        rprocs = <&xp70_tango_sc>;
+			rproc-names = "tango-sc";
+#endif
+		};
+		
+		st231_gp0:st231-gp0@0 {
+			reg = <ST231_GP0_MEM_BASE_ADDR ST231_GP0_MEM_SIZE>;
+		};
+		st231_gp1:st231-gp1@0 {
+			reg = <ST231_GP1_MEM_BASE_ADDR ST231_GP1_MEM_SIZE>;
+		};
+		st231_audio: st231-audio@0 {
+			reg = <ST231_AUDIO_MEM_BASE_ADDR ST231_AUDIO_MEM_SIZE>;
+		};
+		st231_dmu: st231-dmu@0 {
+			reg = <ST231_DMU_MEM_BASE_ADDR ST231_DMU_MEM_SIZE>;
+		};
+
+		ics {
+		compatible = "st,stih407-ics";
+		rprocs = <&st231_gp1>, <&st231_dmu>, <&st231_audio>, <&st231_gp0>;
+		rproc-names = "gp1", "video", "audio", "gp0";
+		};
+
+		/* socinfo:
+		 * product code and commercial code, can be accessed
+		 * from user space respectively from:
+		 *    /sys/bus/soc/devices/soc0/family
+		 *    /sys/bus/soc/devices/soc0/profile
+		 */
+		socinfo {
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+			st,syscfg-socinfo = <&syscfg_fuse 0x12e0 0x12e4>;
+#else
+			st,syscfg-socinfo = <&syscfg_fuse 0x1034 0x1028>;
+#endif
+			st,syscfg-eng = <&syscfg_eng_fuse 0x83c>;
+		};
+
+		/* Temperature sensor compensation */
+		/* not accessible in user space	*/
+		temp0 {
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+			st,syscfg-calib = <&syscfg_eng_fuse 0x498>;
+#else
+			st,syscfg-calib = <&syscfg_eng_fuse 0x840>;
+#endif
+		};
+
+		/* AVS code for DVFS */
+		/* not accessible in user space	*/
+		sti_cpufreq_init {
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+			st,syscfg-pcode = <&syscfg_eng_fuse 0x404>;
+#else
+			st,syscfg-pcode = <&syscfg_eng_fuse 0x840>;
+#endif
+		};
+
+		syscfg_fuse:nvs_10_public_port@0x8a40000 {
+			compatible = "syscon";
+			reg = <0x8a40000 0x2000>;
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+			holes = <0x0     0x12e0
+				 0x12e8  0xd18>;
+#else
+			holes = <0x0     0x1028
+				 0x102c  0x8
+				 0x1038  0xfc8>;
+#endif
+		};
+
+		/* temp0 and sti_cpufreq_init from Sngineering SAFMEM
+		 * (bitfiels of same word)
+		 */
+#if defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+		syscfg_eng_fuse:nvs_10_public_port@0x08A42000 {
+			compatible = "syscon";
+			reg = <0x08A42000 0x1000>;
+#else
+		syscfg_eng_fuse:nvs_10_public_port@0x08A65000 {
+			compatible = "syscon";
+			reg = <0x08A65000 0x1000>;
+#endif
+			holes = <0x0 0x83c
+				 0x844 0x7bc>;
+		};
+	};
+};

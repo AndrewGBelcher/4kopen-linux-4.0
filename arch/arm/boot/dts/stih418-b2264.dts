@@ -1,0 +1,25 @@
+/*
+ * Copyright (C) 2017 STMicroelectronics (R&D) Limited.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+#include "stih418.dtsi"
+#include "stihxxx-b2264.dtsi"
+/ {
+	model = "STiH418 B2264";
+	compatible = "st,stih418-b2264", "st,stih418", "st,stih410";
+
+	memory {
+		device_type = "memory";
+		reg = <0x40000000 0xc0000000>;
+	};
+
+	pwm_regulator: pwm-regulator {
+		compatible = "st,pwm-regulator";
+		status = "okay";
+		pwms = <&pwm1 3 8448>;
+	};
+};

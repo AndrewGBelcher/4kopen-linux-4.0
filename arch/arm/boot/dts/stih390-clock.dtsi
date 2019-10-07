@@ -1,0 +1,632 @@
+/*
+ * Copyright (C) 2015 STMicroelectronics R&D Limited
+ * Author: Guillaume Kouadio Carry <guillaume.kouadio-carry@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include "dt-bindings/reset-controller/stih390-resets.h"
+
+/ {
+	fcgate_clocks {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		/* FC - HSIF */
+		usb3_hsif: usb3_hsif@7000 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc7_hsif SYSCFG_7000 16>;
+			#power-domain-cells = <0>;
+		};
+
+		usb2_hsif: usb2_hsif@7010 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc7_hsif SYSCFG_7010 16>;
+			#power-domain-cells = <0>;
+		};
+
+		gmac_hsif: gmac_hsif@7060 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc7_hsif SYSCFG_7060 16>;
+			#power-domain-cells = <0>;
+		};
+
+		hsif_fc:hsif_fc {
+			compatible = "st,grp-pd";
+			#power-domain-cells = <0>;
+			power-domains = <&usb3_hsif>, <&usb2_hsif>, <&gmac_hsif>;
+		};
+
+		/* FC - VDEC */
+		c8vdec_vdec:c8vdec_vdec@3000 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc3_vdec SYSCFG_3000 16>;
+			#power-domain-cells = <0>;
+		};
+
+		c8had_vdec:c8had_vdec@3001 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc3_vdec SYSCFG_3001 16>;
+			#power-domain-cells = <0>;
+		};
+
+		c8jpg_vdec:c8jpg_vdec@3002 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc3_vdec SYSCFG_3002 16>;
+			#power-domain-cells = <0>;
+		};
+
+		st231dmu_vdec:st231dmu_vdec@3003 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc3_vdec SYSCFG_3003 16>;
+			#power-domain-cells = <0>;
+		};
+
+		mbxdmu_vdec:mbxdmu_vdec@3004 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc3_vdec SYSCFG_3004 16>;
+			#power-domain-cells = <0>;
+		};
+
+		vdec_fc:vdec_fc {
+			compatible = "st,grp-pd";
+			#power-domain-cells = <0>;
+			power-domains = <&c8vdec_vdec>, <&c8had_vdec>,
+			<&c8jpg_vdec>, <&st231dmu_vdec>, <&mbxdmu_vdec>;
+		};
+
+		/* FC - BOOTDEV */
+		sdemmc0_bootdev:sdemmc0_bootdev@11006 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc11_bootdev SYSCFG_11006 16>;
+			#power-domain-cells = <0>;
+		};
+
+		nandpwrdn_bootdev:nandpwrdn_bootdev@11008 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc11_bootdev SYSCFG_11008 17>;
+			#power-domain-cells = <0>;
+		};
+
+		nand_bootdev:nand_bootdev@11008 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc11_bootdev SYSCFG_11008 16>;
+			#power-domain-cells = <0>;
+		};
+
+		spi_bootdev:spi_bootdev@11009 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc11_bootdev SYSCFG_11009 16>;
+			#power-domain-cells = <0>;
+		};
+
+		emmc_bootdev:emmc_bootdev@11010 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc11_bootdev SYSCFG_11010 16>;
+			#power-domain-cells = <0>;
+		};
+
+		bootdev_fc:bootdev_fc {
+			compatible = "st,grp-pd";
+			#power-domain-cells = <0>;
+			power-domains = <&sdemmc0_bootdev>, <&nandpwrdn_bootdev>,
+			<&nand_bootdev>, <&spi_bootdev>, <&emmc_bootdev>;
+		};
+
+		/* FC - TS */
+		stfe_ts:stfe_ts@13000 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc13_ts SYSCFG_13000 16>;
+			#power-domain-cells = <0>;
+		};
+
+		stbe_ts:stbe_ts@13008 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc13_ts SYSCFG_13008 16>;
+			#power-domain-cells = <0>;
+		};
+
+		ts_fc:ts_fc {
+			compatible = "st,grp-pd";
+			#power-domain-cells = <0>;
+			power-domains = <&stfe_ts>, <&stbe_ts>;
+		};
+
+		/* FC - GPU */
+		mali_gpu:mali_gpu@10000 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc10_gpu SYSCFG_10000 16>;
+			#power-domain-cells = <0>;
+		};
+
+		ths_gpu:ths_gpu@10010 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc10_gpu SYSCFG_10010 16>;
+			#power-domain-cells = <0>;
+		};
+
+		gpu_fc:gpu_fc {
+			compatible = "st,grp-pd";
+			#power-domain-cells = <0>;
+			power-domains = <&mali_gpu>, <&ths_gpu>;
+		};
+
+		/* FC - ST231 */
+		gp0_st231ss:gp0_st231ss@9010 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc9_st231ss SYSCFG_9010 16>;
+			#power-domain-cells = <0>;
+		};
+
+		gp1_st231ss:gp1_st231ss@9020 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc9_st231ss SYSCFG_9020 16>;
+			#power-domain-cells = <0>;
+		};
+
+		st231ss_fc:st231ss_fc {
+			compatible = "st,grp-pd";
+			#power-domain-cells = <0>;
+			power-domains = <&gp0_st231ss>, <&gp1_st231ss>;
+		};
+
+		/* FC - WIFI */
+		gmacw_wifi:gmacw_wifi@2000 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc2_wifi SYSCFG_2000 16>;
+			#power-domain-cells = <0>;
+		};
+
+		wifiwrap_wifi:wifiwrap_wifi@2010 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc2_wifi SYSCFG_2010 16>;
+			#power-domain-cells = <0>;
+		};
+
+		wifi_fc:wifi_fc {
+			compatible = "st,grp-pd";
+			#power-domain-cells = <0>;
+			power-domains = <&gmacw_wifi>, <&wifiwrap_wifi>;
+		};
+
+		/* FC - DISPLAY */
+		hqvdp_display:hqvdp_display@6000 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6000 16>;
+			#power-domain-cells = <0>;
+		};
+
+		vdpaux_display:vdpaux_display@6001 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6001 16>;
+			#power-domain-cells = <0>;
+		};
+
+		compo_display:compo_display@6002 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6002 16>;
+			#power-domain-cells = <0>;
+		};
+
+		hdtvout_display:hdtvout_display@6003 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6003 16>;
+			#power-domain-cells = <0>;
+		};
+
+		fdma0_display:fdma0_display@6004 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6004 16>;
+			#power-domain-cells = <0>;
+		};
+
+		fdma1_display:fdma1_display@6005 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6005 16>;
+			#power-domain-cells = <0>;
+		};
+
+		uplayer1_display:uplayer1_display@6006 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6006 16>;
+			#power-domain-cells = <0>;
+		};
+
+		uplayer2_display:uplayer2_display@6007 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6007 16>;
+			#power-domain-cells = <0>;
+		};
+
+		uplayer3_display:uplayer3_display@6008 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6008 16>;
+			#power-domain-cells = <0>;
+		};
+
+		ureader1_display:ureader1_display@6009 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6009 16>;
+			#power-domain-cells = <0>;
+		};
+
+		bdisp_display:bdisp_display@6010 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6010 16>;
+			#power-domain-cells = <0>;
+		};
+
+		hdmirx_display:hdmirx_display@6011 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6011 16>;
+			#power-domain-cells = <0>;
+		};
+
+		hdmirx_phy_display:hdmirx_phy_display@6012 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6012 16>;
+			#power-domain-cells = <0>;
+		};
+
+		dvpin_display:dvpin_display@6013 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6013 16>;
+			#power-domain-cells = <0>;
+		};
+
+		hdmitx_phy_display:hdmitx_phy_display@6014 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_fc6_display SYSCFG_6014 16>;
+			#power-domain-cells = <0>;
+		};
+
+		display_fc:display_fc {
+			compatible = "st,grp-pd";
+			#power-domain-cells = <0>;
+			power-domains = <&hqvdp_display>, <&vdpaux_display>,
+			<&compo_display>, <&hdtvout_display>, <&fdma0_display>,
+			<&fdma1_display>,<&uplayer1_display>, <&uplayer2_display>,
+			<&uplayer3_display>, <&ureader1_display>, <&bdisp_display>,
+			<&hdmirx_display>, <&hdmirx_phy_display>, <&dvpin_display>,
+			<&hdmitx_phy_display>;
+		};
+
+		/* FC - ARMCORES */
+		nic301_armcores: nic301_armcores@15000 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_a9 SYSCFG_15000 16>;
+			#power-domain-cells = <0>;
+		};
+
+		debug_armcores: debug_armcores@15001 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_a9 SYSCFG_15001 16>;
+			#power-domain-cells = <0>;
+		};
+
+		atb_armcores: atb_armcores@15002 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_a9 SYSCFG_15002 16>;
+			#power-domain-cells = <0>;
+		};
+
+		trace_armcores: trace_armcores@15003 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_a9 SYSCFG_15003 16>;
+			#power-domain-cells = <0>;
+		};
+
+		stbus2axi_armcores: stbus2axi_armcores@15004 {
+			compatible = "st,fcgate-pd";
+			st,syscfg = <&syscfg_a9 SYSCFG_15004 16>;
+			#power-domain-cells = <0>;
+		};
+
+		armcores_fc: armcores_fc {
+			compatible = "st,grp-pd";
+			#power-domain-cells = <0>;
+			power-domains = <&nic301_armcores>, <&debug_armcores>,
+			<&atb_armcores>, <&trace_armcores>, <&stbus2axi_armcores>;
+		};
+	};
+
+	fcgate_grp: fcgate_grp {
+		compatible = "st,grp-pd";
+		#power-domain-cells = <0>;
+		power-domains = <&hsif_fc>, <&vdec_fc>, <&bootdev_fc>,
+		<&ts_fc>, <&gpu_fc>, <&st231ss_fc>, <&wifi_fc>, <&display_fc>,
+		<&armcores_fc>;
+	};
+
+	clocks {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		compatible = "st,stih390-clk", "simple-bus";
+		power-domains = <&fcgate_grp>;
+
+		/*
+		 * Fixed 30MHz oscillator inputs to SoC
+		 */
+		CLK_SYSIN: CLK_SYSIN {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <30000000>;
+			clock-output-names = "CLK_SYSIN";
+		};
+
+		/*
+		 * Fixed clock added to act as parent for flexigen parents
+		 * for unused values in the multiplexer registers
+		 */
+		CLK_INVALID: CLK_INVALID {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <0>;
+			clock-output-names = "CLK_INVALID";
+		};
+
+		CLK_S_A0: clockgenA@8060000 {
+			compatible = "st,clkgen-c32";
+			reg = <0x8060000 0x1000>;
+
+			CLK_S_A0_PLL0: CLK_S_A0_PLL0 {
+				compatible = "st,plls-c32-bx", "st,clkgen-plls-c32";
+
+				#clock-cells = <1>;
+				clocks = <&CLK_SYSIN>;
+				clock-output-names = "CLK_S_A0_PLL0_ODF_0",
+						     "CLK_S_A0_PLL0_ODF_1",
+						     "CLK_S_A0_PLL0_ODF_2",
+						     "CLK_S_A0_PLL0_ODF_3";
+			};
+
+			CLK_S_A0_FLEXGEN: CLK_S_A0_FLEXGEN {
+				compatible = "st,flexgen";
+				#clock-cells = <1>;
+
+				clocks = <&CLK_S_A0_PLL0 0>,
+					 <&CLK_S_A0_PLL0 1>,
+					 <&CLK_S_A0_PLL0 2>,
+					 <&CLK_S_A0_PLL0 3>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_SYSIN>;
+
+				clock-output-names = "CLK_ICN_LMI";
+			};
+		};
+
+		CLK_S_C0_QUADFS: CLK_S_C0_QUADFS {
+			compatible = "st,quadfs660-B", "st,quadfs";
+			reg = <0x8000000 0x1000>;
+
+			#clock-cells = <1>;
+			clocks = <&CLK_SYSIN>;
+			clock-output-names = "CLK_S_C0_FS0_CH0",
+					     "CLK_S_C0_FS0_CH1",
+					     "CLK_S_C0_FS0_CH2",
+					     "CLK_S_C0_FS0_CH3",
+					     "CLK_S_C0_FS0_VCO";
+		};
+
+		CLK_S_C0: clockgenC@8000000 {
+			compatible = "st,clkgen-c32";
+			reg = <0x8000000 0x1000>;
+
+			CLK_S_C0_PLL0: CLK_S_C0_PLL0 {
+				compatible = "st,plls-c32-bx", "st,clkgen-plls-c32";
+
+				#clock-cells = <1>;
+				clocks = <&CLK_SYSIN>;
+				clock-output-names = "CLK_S_C0_PLL0_ODF_0",
+						     "CLK_S_C0_PLL0_ODF_1",
+						     "CLK_S_C0_PLL0_ODF_2",
+						     "CLK_S_C0_PLL0_ODF_3";
+			};
+
+			CLK_S_C0_PLL1: CLK_S_C0_PLL1 {
+				compatible = "st,plls-c32-bx", "st,clkgen-plls-c32";
+
+				#clock-cells = <1>;
+				clocks = <&CLK_SYSIN>;
+				clock-output-names = "CLK_S_C0_PLL1_ODF_0",
+						     "CLK_S_C0_PLL1_ODF_1",
+						     "CLK_S_C0_PLL1_ODF_2",
+						     "CLK_S_C0_PLL1_ODF_3";
+			};
+
+			CLK_S_C0_FLEXGEN: CLK_S_C0_FLEXGEN {
+				compatible = "st,flexgen";
+
+				#clock-cells = <1>;
+
+				clocks = <&CLK_S_C0_PLL0 0>,
+					 <&CLK_S_C0_PLL0 1>,
+					 <&CLK_S_C0_PLL0 2>,
+					 <&CLK_S_C0_PLL0 3>,
+					 <&CLK_S_C0_PLL1 0>,
+					 <&CLK_S_C0_PLL1 1>,
+					 <&CLK_S_C0_PLL1 2>,
+					 <&CLK_S_C0_PLL1 3>,
+					 <&CLK_S_C0_QUADFS 4>,
+					 <&CLK_S_C0_QUADFS 0>,
+					 <&CLK_S_C0_QUADFS 1>,
+					 <&CLK_S_C0_QUADFS 2>,
+					 <&CLK_S_C0_QUADFS 3>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_SYSIN>;
+
+				clock-output-names = "CLK_SLIM_CC", /*div_0 */
+						     "CLK_SPI",
+						     "CLK_FLASH",
+						     "CLK_MMC_0",
+						     "CLK_PERIPH_TS",
+						     "CLK_EXT2F_A9",
+						     "CLK_ICN_TS",
+						     "CLK_NAND",
+						     "CLK_MMC_1",
+						     "CLK_ST231_GP_2",
+						     "CLK_ST231_VDEC", /*div_10 */
+						     "CLK_ST231_GP_0",
+						     "CLK_ST231_GP_1_AUDIO",
+						     "CLK_ETH_GMAC_S",
+						     "CLK_GMAC_S_PHYCLK",
+						     "CLK_ETH_GMAC_W",
+						     "CLK_GMAC_W_PHYCLK",
+						     "CLK_STBE",
+						     "CLK_HEVC_H264",
+						     "CLK_AVSP",
+						     "CLK_TIMER_A9", /*div_20 */
+						     "CLK_SLIM_VDEC",
+						     "CLK_DEC_JPEG",
+						     "CLK_WIFI",
+						     "CLK_RX_ICN_L0L1",
+						     "CLK_FRC_1",
+						     "CLK_FRC_1_PAD",
+						     "CLK_DVP_PROC",
+						     "CLK_TX_ICN_L0L1",
+						     "CLK_SYS_CLK_OUT",
+						     "CLK_SYSTEM_STFE", /*div_30 */
+						     "",
+						     "CLK_SLIM_FDMA_1",
+						     "CLK_ATB",
+						     "CLK_TRACE",
+						     "CLK_BDISP",
+						     "CLK_PROC_VDP",
+						     "CLK_DSS",
+						     "",
+     						     "CLK_LPC",
+						     "CLK_GPU", /*div_40 */
+						     "CLK_ICN_WIFI",
+						     "CLK_ICN_DISP",
+						     "CLK_ICN_CPU",
+						     "CLK_PERIPH_WIFI",
+						     "CLK_SLIM_FDMA_0",
+						     "CLK_PERIPH_DISP",
+						     "CLK_PERIPH_CPU"; /*div_47 */
+				};
+		};
+
+		CLK_S_D0_QUADFS: CLK_S_D0_QUADFS {
+			compatible = "st,quadfs660-B", "st,quadfs";
+			reg = <0x8030000 0x1000>;
+
+			#clock-cells = <1>;
+			clocks = <&CLK_SYSIN>;
+			clock-output-names = "CLK_S_D0_FS0_CH0",
+					     "CLK_S_D0_FS0_CH1",
+					     "CLK_S_D0_FS0_CH2",
+					     "CLK_S_D0_FS0_CH3",
+					     "CLK_S_D0_FS0_VCO";
+		};
+
+		CLK_S_D0: clockgenD@8030000 {
+			compatible = "st,clkgen-c32";
+			reg = <0x8030000 0x1000>;
+
+			CLK_S_D0_FLEXGEN: CLK_S_D0_FLEXGEN {
+				compatible = "st,flexgen";
+				#clock-cells = <1>;
+
+				clocks = <&CLK_S_D0_QUADFS 4>,
+					 <&CLK_S_D0_QUADFS 0>,
+					 <&CLK_S_D0_QUADFS 1>,
+					 <&CLK_S_D0_QUADFS 2>,
+					 <&CLK_S_D0_QUADFS 3>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_SYSIN>;
+
+				clock-output-names = "CLK_PCM_0", /* div_0 */
+						     "CLK_PCM_1",
+						     "CLK_PCM_2",
+						     "CLK_SPDIF",
+						     "CLK_PCMR_0_MASTER",
+						     "CLK_MCLK_OUT"; /* div_5 */
+			};
+		};
+
+		/*
+		 * SRCCLKIN_0 is the clock source for TMDS_CLK
+		 */
+		SRCCLKIN_0: SRCCLKIN_0 {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <225000000>;
+		};
+
+		CLK_S_D1_QUADFS: CLK_S_D1_QUADFS {
+			compatible = "st,quadfs660-B", "st,quadfs";
+			reg = <0x8040000 0x1000>;
+
+			#clock-cells = <1>;
+			clocks = <&CLK_SYSIN>;
+			clock-output-names = "CLK_S_D1_FS0_CH0",
+					     "CLK_S_D1_FS0_CH1",
+					     "CLK_S_D1_FS0_CH2",
+					     "CLK_S_D1_FS0_CH3",
+					     "CLK_S_D1_FS0_VCO";
+		};
+
+
+		CLK_S_D1: clockgenD@8040000 {
+			compatible = "st,clkgen-c32";
+			reg = <0x8040000 0x1000>;
+
+			CLK_S_D1_FLEXGEN: CLK_S_D1_FLEXGEN {
+				compatible = "st,flexgen";
+				#clock-cells = <1>;
+
+				clocks = <&CLK_S_D1_QUADFS 4>,
+					 <&CLK_S_D1_QUADFS 0>,
+					 <&CLK_S_D1_QUADFS 1>,
+					 <&CLK_S_D1_QUADFS 2>,
+					 <&CLK_S_D1_QUADFS 3>,
+					 <&SRCCLKIN_0>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_INVALID>,
+					 <&CLK_SYSIN>;
+
+				clock-output-names = "CLK_PIX_MAIN_DISP", /* div_0 */
+						     "CLK_PIX_AUX_DISP",
+						     "CLK_PIX_HDDAC",
+						     "CLK_HDDAC",
+						     "",
+						     "",
+						     "CLK_SDDAC",
+						     "CLK_PIX_HDMI",
+						     "CLK_DENC",
+						     "CLK_REF_HDMIPHY",
+						     "CLK_TMDS_HDMI", /* div_10 */
+						     "CLK_PROC_HQVDP",
+ 						     "CLK_IQI_HQVDP",
+						     "CLK_PROC_MIXER",
+     						     "CLK_PROC_GDP_COMPO",
+						     "CLK_PWM",
+						     "CLK_FRC_0",
+ 						     "CLK_FRC_0_PAD",
+ 						     "CLK_FRC_2",
+						     "","",/* div_20 */
+						     "","","","","",
+						     "","","","","",/* div_30 */
+						     "","","","","",
+						     "","","","","CLK_HDMI_PHASE_REG";/* div_40 */
+			};
+		};
+	};
+};

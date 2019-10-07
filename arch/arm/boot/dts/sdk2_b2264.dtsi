@@ -1,0 +1,129 @@
+/*
+ * Copyright (C) 2018 STMicroelectronics Limited.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/ {
+	chosen {
+		bootargs = "console=ttyAS0,115200 bpa2parts=BPA2_Region|aud-coded|aud-transcoded|vid-coded|vid-transcoded|vid-raw-input|vid-output-0|vid-decimated-1|vid-copied-1|vid-macroblock-0|vid-extra-data-0|vid-extra-data-1|v4l2-coded-video-buffers|vid-enc-data-0|vid-enc-scaled-0|vid-encoded-0|v4l2-clut|v4l2-grab|gfx-memory|aud-codec-data|vid-codec-data|aud-output-0|aud-output-1|vid-output-1|vid-decimated-0|vid-copied-0|vid-macroblock-1|blitter|vid-enc-data-1|vid-enc-scaled-1|vid-encoded-1|coredisplay-video|multicom|hades-l3|BPA2_Region0|BPA2_Region1|display-secure:936M:0xC3900000,v4l2-vb2|v4l2-stmc8jpg|v4l2-stmvout|v4l2-compo:184M:0xB8100000,modules|audio:8M:0xB7900000,DTU_PART:16384:0xFEEFC000,BPA2_SecureShm|streaming-shm:2032k:0xFED00000,bigphysarea|te-buffers|m2m-ca3:86M:0x90000000 vmalloc=1167m mem=898629632@0x82000000";
+	};
+
+	aliases {
+		scr0 = &scr0;
+		scr1 = &scr1;
+		cec0 = &cec0;
+		i2c0 = &i2c11;	/* HDMI */
+		i2c2 = &i2c5;	/* I2C on Touch screen connector */
+		hdmi0 = &hdmi0;
+		hdmi-repeater0 = &hdmi0;
+		blitter0 = &blitter0;
+		blitter1 = &blitter1;
+	};
+
+	pwm-regulator {
+		regulator-min-microvolt = <784000>;
+		regulator-max-microvolt = <1299000>;
+	};
+
+	soc {
+		nandbch: nand-bch {
+			status = "disabled";
+			compatible = "st,nand-bch-ip-plug";
+		};
+
+		nand_banks: nand-banks {
+			bank0 {
+				partitions {
+					partition@0{
+						label = "NAND boot";
+						reg = <0x00000000 0x00800000>;
+					};
+					partition@1{
+						label = "NAND rootfs";
+						reg = <0x00800000 0x1f800000>;
+					};
+				};
+			};
+		};
+
+		mmc0: sdhci@09060000 {
+			pinctrl-0 = <&pinctrl_sd0>;
+			max-frequency = <52000000>;
+			cd-gpio = <&PIO42 4 ALT2 IN>;
+			mmc-cap-sd-highspeed;
+			/delete-property/ non-removable;
+
+			status = "okay";
+		};
+
+		vqmmc_reg: voltage-regulator {
+			status = "disabled";
+		};
+
+		miphy28lp_phy0: miphy28lp@0 {
+			st,sata_gen = "gen3";
+
+			status = "okay";
+		};
+
+		miphy28lp_phy1: miphy28lp@1 {
+			/delete-property/ st,sata_gen;
+
+			status = "okay";
+		};
+
+		pcie0: pcie@9b00000 {
+			status = "disabled";
+		};
+
+		pcie1: pcie@9b10000 {
+			reset-gpio = <&PIO34 5 0>;
+
+			status = "okay";
+		};
+
+		sata0: sata@9b20000 {
+			status = "okay";
+		};
+
+		sata1: sata@9b28000 {
+			status = "disabled";
+		};
+
+		mmc1: sdhci@09080000 {
+			status = "disabled";
+		};
+
+		sti_cpufreq_init {
+			opp-list {
+				opp1 {
+					st,abbP;
+					st,abbN;
+					st,avs = <0x0000041a 0x0000041a 0x0000041a 0x0000041a 0x00000406 0x000003f2 0x000003de 0x000003ca 0x000003b6 0x000003a2 0x00000398 0x0000038e 0x00000384 0x00000384 0x00000384 0x00000384>;
+					st,freq = <0x00000320>;
+					st,substrate = <0x000000ff>;
+					st,cuts = <0x000000ff>;
+				};
+				opp0 {
+					st,abbP;
+					st,abbN;
+					st,avs = <0x000004b0 0x000004b0 0x000004b0 0x000004b0 0x0000049c 0x00000488 0x00000474 0x00000460 0x0000044c 0x00000438 0x0000042e 0x0000041a 0x00000406 0x000003f2 0x000003f2 0x000003f2>;
+					st,freq = <0x000004b0>;
+					st,substrate = <0x000000ff>;
+					st,cuts = <0x000000ff>;
+				};
+				opp2 {
+					st,abbP;
+					st,abbN;
+					st,avs = <0x00000384 0x00000384 0x00000384 0x00000384 0x00000384 0x00000384 0x00000384 0x00000384 0x00000384 0x00000384 0x00000384 0x00000384 0x00000384 0x00000384 0x00000384 0x00000384>;
+					st,freq = <0x00000258>;
+					st,substrate = <0x000000ff>;
+					st,cuts = <0x000000ff>;
+					st,opp = <0x00000002>;
+				};
+			};
+		};
+	};
+};

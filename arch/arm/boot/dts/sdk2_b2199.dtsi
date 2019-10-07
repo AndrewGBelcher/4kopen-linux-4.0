@@ -1,0 +1,64 @@
+/*
+ * Copyright (C) 2013 STMicroelectronics Limited.
+ * Author(s): Giuseppe Condorelli <giuseppe.condorelli@st.com>
+ *            Carmelo Amoroso <carmelo.amoroso@st.com>
+ *            Giuseppe Cavallaro <peppe.cavallaro@st.com>
+ *            Nunzio Raciti <nunzio.raciti@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * publishhed by the Free Software Foundation.
+ */
+
+/ {
+	chosen {
+		bootargs = "console=ttyAS0,115200 bpa2parts=BPA2_Region|aud-coded|aud-transcoded|vid-coded|vid-transcoded|vid-raw-input|vid-output-0|vid-decimated-1|vid-copied-1|vid-macroblock-0|vid-extra-data-0|vid-extra-data-1|v4l2-coded-video-buffers|vid-enc-data-0|vid-enc-scaled-0|vid-encoded-0|v4l2-clut|v4l2-grab|gfx-memory|aud-codec-data|vid-codec-data|aud-output-0|aud-output-1|vid-output-1|vid-decimated-0|vid-copied-0|vid-macroblock-1|blitter|vid-enc-data-1|vid-enc-scaled-1|vid-encoded-1|coredisplay-video|multicom|hades-l3|BPA2_Region0|BPA2_Region1|display-secure:936M:0xC3900000,v4l2-vb2|v4l2-stmc8jpg|v4l2-stmvout|v4l2-compo:184M:0xB8100000,modules|audio:8M:0xB7900000,DTU_PART:16384:0xFEEFC000,BPA2_SecureShm|streaming-shm:2032k:0xFED00000,bigphysarea|te-buffers|m2m-ca3:86M:0x90000000 vmalloc=1167m mem=898629632@0x82000000";
+	};
+
+	aliases {
+		scr0 = &scr0;
+		scr1 = &scr1;
+		cec0 = &cec0;
+		i2c0 = &i2c11;	/* HDMI */
+		i2c1 = &i2c3;	/* NIM-B */
+		i2c2 = &i2c4;	/* miniPCIe */
+		i2c3 = &i2c5;	/* stv6440 / M24256-B eeprom  */
+		i2c4 = &i2c10;	/* stv0368 */
+		i2c5 = &i2c2;	/* NIM-A */
+		hdmi0 = &hdmi0;
+		hdmi-repeater0 = &hdmi0;
+		blitter0 = &blitter0;
+		blitter1 = &blitter1;
+	};
+
+	soc {
+		nandbch: nand-bch {
+			status = "disabled";
+			compatible = "st,nand-bch-ip-plug";
+		};
+
+		nand_banks: nand-banks {
+			bank0 {
+				partitions {
+					partition@0{
+						label = "NAND boot";
+						reg = <0x00000000 0x00800000>;
+					};
+					partition@1{
+						label = "NAND rootfs";
+						reg = <0x00800000 0x1f800000>;
+					};
+				};
+			};
+		};
+
+		mmc0: sdhci@09060000 {
+			status = "okay";
+			non-removable;
+			max-frequency = <200000000>;
+			mmc-cap-uhs-sdr50;
+			mmc-cap-uhs-sdr104;
+			mmc-cap-uhs-ddr50;
+		};
+	};
+};

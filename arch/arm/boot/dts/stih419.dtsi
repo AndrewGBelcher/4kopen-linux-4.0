@@ -1,0 +1,212 @@
+/*
+ * Copyright (C) 2015 STMicroelectronics Limited.
+ * Author: Pankaj Dev <pankaj.dev@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+#include "stih419-clock.dtsi"
+#include "stih407-family.dtsi"
+/ {
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		cpu@0 {
+			cpu0-supply = <&pwm_regulator>;
+		};
+		cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a9";
+			reg = <1>;
+		};
+		cpu@2 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a9";
+			reg = <2>;
+		};
+		cpu@3 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a9";
+			reg = <3>;
+		};
+	};
+
+	pwm_regulator: pwm-regulator {
+		compatible = "st,pwm-regulator";
+		status = "disabled";
+		regulator-name = "CPU_1V0_AVS";
+		regulator-min-microvolt = <848000>;
+		regulator-max-microvolt = <1147000>;
+		regulator-always-on;
+	};
+
+	soc {
+		pmu {
+			compatible = "st,stih418-pmu-syscfg";
+		};
+
+		temp0{
+			compatible = "st,stih419-thermal";
+		};
+
+		syscfg_sbc_reg:fvdp-lite-syscfg@9600000{
+			holes = <0x0 0x8
+				 0xc 0x4
+				 0x14 0xc
+				 0x24 0xc
+				 0x34 0xc
+				 0x48 0x8
+				 0x54 0xc
+				 0x68 0x18
+				 0x84 0x15c
+				 0x1e8 0x20
+				 0x210 0x5c0
+				 0x7dc 0x4
+				 0x7e8 0x8
+				 0x7f8 0x8
+				 0x804 0xc
+				 0x818 0x8
+				 0x824 0x28
+				 0x850 0x7b0>;
+		};
+
+		syscfg_core:core-syscfg@92b0000{
+			holes = <0xc 0x14
+				 0x24 0x20
+				 0x48 0x18
+				 0x64 0xc
+				 0x74 0xc
+				 0x84 0x1c
+				 0xac 0x2c
+				 0xe8 0x4
+				 0x104 0xc
+				 0x128 0x18
+				 0x144 0x1c
+				 0x164 0x1c
+				 0x184 0x14
+				 0x1dc 0x24
+				 0x21c 0x4
+				 0x24c 0x48
+				 0x298 0x10
+				 0x2ac 0x10
+				 0x2c8 0x68
+				 0x35c 0x474
+				 0x7d8 0x18
+				 0x808 0x8
+				 0x824 0xc
+				 0x83c 0x38
+				 0x878 0x4
+				 0x89c 0x14
+				 0x8b8 0xc
+				 0x8c8 0xc
+				 0x8d8 0xc
+				 0x8ec 0x24
+				 0x914 0xc
+				 0x924 0x24
+				 0x94c 0x6b4>;
+		};
+
+		/* sysconfig for GP_13 */
+		syscfg_gp_13: gp-13-syscfg@0x0b300000 {
+			compatible = "syscon";
+			reg = <0xb300000 0x1000>;
+			 holes = <0x4 0x24
+				  0x38 0x18
+				  0x58 0x138
+				  0x198 0xe68>;
+                };
+
+		socinfo {
+			compatible = "st,stih418-socinfo";
+			st,syscfg = <&syscfg_sbc_reg>;
+		};
+
+		hdmi_formater:hdmi_fformat@8D04000 {
+			holes = <0x14 0x8
+				 0x28 0xd8
+				 0x130 0xd0
+				 0x208 0x8
+				 0x240 0x4
+				 0x24c 0xb8
+				 0x324 0xdc
+				 0x408 0xf8
+				 0x50c 0x4
+				 0x514 0x4
+				 0x524 0xc
+				 0x538 0xc8
+				 0x6a0 0x960>;
+		};
+
+		st_usb_bus_config: st-usb-amba-config {
+			st,set_by_boot;
+		};
+
+		st_dwc3: dwc3@8f94000 {
+			st,gsbuscfg = <0xE 0xF00>;
+		};
+
+		pwm1: pwm@9510000 {
+			compatible = "st,sti-pwm";
+			status = "okay";
+			pinctrl-0 = <&pinctrl_pwm1_chan3_default>;
+		};
+
+		sti_cpufreq_init {
+			compatible = "st,stih419-cpufreq-init";
+			st,operating-points = <
+				/* kHz */
+				1200000 800000 500000
+			 >;
+			sti_bb {
+				compatible = "st,stih407-bb";
+				cpu0-supply = <&pwm_regulator>;
+			};
+		};
+
+		nandbch: nand-bch {
+			compatible = "st,nand-bch-ip-plug", "st,nand-bch-rnd-data-read";
+			reg = <0x09021000 0x1000>, <0x09060800 0x1000>;
+			st,bch-select-reg = <0x09061800>;
+		};
+
+		vqmmc_reg: voltage-regulator {
+			/* Control register for the VSENSE Module */
+			reg = <0x9061804 0x4>;
+		};
+
+		/*
+		 * STiH419 has integrated the FlashSS Core version 2.0
+		 * (FlashSS IP functional specification revision 1.5).
+		 */
+		mmc0: sdhci@09060000 {
+			reg = <0x09060000 0x7ff>, <0x9061808 0x20>;
+			st,flashss-version = <FLASHSS_CORE_VERSION_2_0>;
+		};
+
+		lpm:stm-lpm@9400000 {
+			compatible = "st,stih418-lpm", "st,lpm";
+			st,fw_name = "lpm-fw-STiH418.elf";
+		};
+
+		ddr-pctl-controller {
+			st,interleaving;
+			st,ddr_sr_ack_pctl;
+			ddr-pctl@0aa10000 {
+				compatible = "st,stih407-ddr-controller_new", "st,ddr-controller";
+				reg = <0x0aa10000 0x2000>;
+				st,syscfg = <&syscfg_core>;
+			};
+		};
+
+		ddr-mixer {
+			ddr-mixer@0aa12000 {
+				reg = <0x0aa12000 0x2000>;
+			};
+		};
+
+		st231_dmu: st231-dmu@0 {
+			power-domains = <&delta_core>;
+		};
+	};
+};

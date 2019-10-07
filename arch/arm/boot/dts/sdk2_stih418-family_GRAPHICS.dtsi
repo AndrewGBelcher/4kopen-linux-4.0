@@ -1,0 +1,86 @@
+/*
+ * Copyright (C) 2013 STMicroelectronics Limited.
+ * Author(s): Giuseppe Condorelli <giuseppe.condorelli@st.com>
+ *            Carmelo Amoroso <carmelo.amoroso@st.com>
+ *            Giuseppe Cavallaro <peppe.cavallaro@st.com>
+ *            Nunzio Raciti <nunzio.raciti@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * publishhed by the Free Software Foundation.
+ */
+
+#if defined (CONF_SOC_h418) || defined (CONF_SOC_h318) || defined (CONF_SOC_h419) || defined (CONF_SOC_h319)
+	#define CLK_ICN_GPU_RATE 400000000
+#elif defined (CONF_SOC_h414) || defined (CONF_SOC_h314)
+	#define CLK_ICN_GPU_RATE 355300000
+#else
+	#error SOC config (h418/h414/h318/h314/h419/h319) not defined
+#endif
+
+
+/ {
+
+	soc {
+
+		/* C8JPG */
+		c8jpg@08c84000 {
+			compatible = "st,c8jpg";
+			/* Always enable as only soc dependent */
+			status = "okay";
+
+			/* Register map & Name */
+			reg = <0x08c84000 0x1000>;
+			reg-names = "c8jpg-io";
+
+			/* Interruption & Name */
+			interrupts = <0 56 0>;
+			interrupt-names = "c8jpg-int";
+
+			/* Clock & Name */
+			clocks = <&CLK_S_C0_FLEXGEN CLK_JPEGDEC>;
+			clock-names = "c8jpg_dec";
+		};
+
+		/* MALI400 */
+		mali: mali@09f00000 {
+			compatible = "st,mali";
+			reg = <0x09f01000 0x200>,
+				<0x09f00000 0x100>, <0x09f03000 0x100>,
+				<0x09f08000 0x1100>, <0x09f04000 0x100>,
+				<0x09f0a000 0x1100>, <0x09f05000 0x100>,
+				<0x09f0c000 0x1100>, <0x09f06000 0x100>,
+				<0x09f0e000 0x1100>, <0x09f07000 0x100>;
+			reg-names = "Mali_L2",
+				"Mali_GP", "Mali_GP_MMU",
+				"Mali_PP0", "Mali_PP0_MMU",
+				"Mali_PP1", "Mali_PP1_MMU",
+				"Mali_PP2", "Mali_PP2_MMU",
+				"Mali_PP3", "Mali_PP3_MMU";
+			interrupts = <GIC_SPI 49 IRQ_TYPE_NONE>,
+				<GIC_SPI 50 IRQ_TYPE_NONE>,
+				<GIC_SPI 41 IRQ_TYPE_NONE>,
+				<GIC_SPI 45 IRQ_TYPE_NONE>,
+				<GIC_SPI 42 IRQ_TYPE_NONE>,
+				<GIC_SPI 46 IRQ_TYPE_NONE>,
+				<GIC_SPI 43 IRQ_TYPE_NONE>,
+				<GIC_SPI 47 IRQ_TYPE_NONE>,
+				<GIC_SPI 44 IRQ_TYPE_NONE>,
+				<GIC_SPI 48 IRQ_TYPE_NONE>;
+			interrupt-names = "Mali_GP_IRQ",
+				"Mali_GP_MMU_IRQ",
+				"Mali_PP0_IRQ",
+				"Mali_PP0_MMU_IRQ",
+				"Mali_PP1_IRQ",
+				"Mali_PP1_MMU_IRQ",
+				"Mali_PP2_IRQ",
+				"Mali_PP2_MMU_IRQ",
+				"Mali_PP3_IRQ",
+				"Mali_PP3_MMU_IRQ";
+			clock-names = "gpu-clk";
+			clocks = <&CLK_S_C0_FLEXGEN CLK_ICN_GPU>;
+			gpu-clk-rate = <CLK_ICN_GPU_RATE>;
+		};
+
+	};
+};

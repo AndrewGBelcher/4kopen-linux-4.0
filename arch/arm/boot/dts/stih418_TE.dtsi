@@ -1,0 +1,149 @@
+/*
+ * Copyright (C) 2013 STMicroelectronics Limited.
+ * Author(s): Giuseppe Condorelli <giuseppe.condorelli@st.com>
+ *            Carmelo Amoroso <carmelo.amoroso@st.com>
+ *            Giuseppe Cavallaro <peppe.cavallaro@st.com>
+ *            Nunzio Raciti <nunzio.raciti@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * publishhed by the Free Software Foundation.
+ */
+
+/ {
+
+	soc {
+		/* STFE resources */
+		stfe_hw_config: stfe-hw-config {
+			stfe-version = <2>;
+
+			nb-ib = <7>;
+			nb-mib = <1>;
+			nb-swts = <8>;
+			nb-tsdma = <2>;
+			nb-ccsc = <1>;
+			nb-tag = <3>;
+
+			ib-offset = <0x1000>;
+			tag-offset = <0x2000>;
+			pid-filter-offset = <0x2800>;
+			system-regs-offset = <0x0000>;
+			memdma-offset = <0x4000>;
+			tsdma-offset = <0x3000>;
+			ccsc-offset = <0x2c00>;
+
+			firmware = "pti_memdma_h407.elf";
+		};
+
+
+		tefe@08a20000 {
+			compatible = "st,tango-fe";
+			status = "okay";
+			reg = <0x08a20000 0x10000>, <0x08a00000 0x4000>;
+			power-down = "no";
+			power-domains = <&stbe_core>;
+			reg-names = "stfe", "stfe-ram";
+			interrupts = <GIC_SPI 35 IRQ_TYPE_NONE>, <GIC_SPI 34 IRQ_TYPE_NONE>;
+			interrupt-names = "stfe-idle-irq", "stfe-error-irq";
+			stfe_config = <&stfe_hw_config>;
+			clocks = <&CLK_S_C0_FLEXGEN CLK_PROC_STFE>,
+				 <&CLK_S_D3_FLEXGEN CLK_TSOUT_0>,
+				 <&CLK_S_D3_FLEXGEN CLK_TSOUT_1>,
+				 <&CLK_S_D3_FLEXGEN CLK_STFE_FRC1>,
+				 <&CLK_S_C0_FLEXGEN CLK_STFE_FRC2>,
+				 <&CLK_S_D3_FLEXGEN CLK_MCHI>;
+
+			clock-names = "stfe_ccsc",
+				      "stfe_tsout-0",
+				      "stfe_tsout-1",
+				      "stfe_frc-0",
+				      "stfe_frc-1",
+				      "stfe_mchi";
+			clocks_param {
+				clk0 {
+					clk-name = "stfe_ccsc";
+				};
+				clk1 {
+					clk-name = "stfe_tsout-0";
+					clk-rate = <108000000>;
+				};
+				clk2 {
+					clk-name = "stfe_tsout-1";
+					clk-rate = <108000000>;
+				};
+				clk3 {
+					clk-name = "stfe_frc-0";
+					clk-rate = <27000000>;
+				};
+				clk4 {
+					clk-name = "stfe_frc-1";
+					clk-rate = <27000000>;
+				};
+				clk5 {
+					clk-name = "stfe_mchi";
+					clk-rate = <27000000>;
+				};
+			};
+		};
+
+		/* Tango resources */
+		tp_hw_config: tp-hw-config {
+			ddem-offset = <0x00000>;
+			idem-offset = <0x10000>;
+			st-bux-plug-write-offset = <0x28000>;
+			st-bux-plug-read-offset = <0x2a000>;
+			core-ctrl-offset = <0x2d000>;
+			mailbox0-to-xp70-offset = <0x2d020>;
+			mailbox0-to-host-offset = <0x2d030>;
+			writelock-error-offset = <0x2d068>;
+			t3-addr-filter-offset = <0x2d06c>;
+			timer-counter-offset = <0x2e060>;
+
+			firmware = "pti_tp3.elf";
+			tp-ver = <3>;
+
+			nb-vdevice = <16>;
+			nb-slot = <246>;
+			nb-section-filter = <208>;
+			nb-dma-structure = <210>;
+			nb-indexer = <32>;
+			nb-status-blk = <32>;
+
+                        /* Max SF allocated for large pool for a unique
+demux*/
+                        nb-large-pool-sf = <44>;
+                        /* Entry to disable TE feature to reserve memory for
+Large pool SF */
+                        disable-data-entry;
+
+			timer-counter-divider = <0x0b>;
+
+			permit-powerdown;
+
+			sc-bypass;
+		};
+
+		tetp@08880000 {
+			compatible = "st,tango-tp";
+			status = "okay";
+			reg = <0x08880000 0x2f000>;
+			power-down = "no";
+			reg-names = "tp";
+			interrupts = <GIC_SPI 25 IRQ_TYPE_NONE>;
+			power-domains = <&stbe_core>;
+			tp_config = <&tp_hw_config>;
+			clocks = <&CLK_S_C0_FLEXGEN CLK_PROC_TP>,
+				 <&CLK_S_C0_FLEXGEN CLK_PROC_SC>;
+			clock-names = "CLK_TP", "CLK_SC";
+			clocks_param {
+				clk0 {
+					clk-name = "CLK_TP";
+				};
+				clk1 {
+					clk-name = "CLK_SC";
+				};
+			};
+		};
+	};
+};
+

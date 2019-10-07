@@ -1,0 +1,30 @@
+/*
+ * Copyright (C) 2015 STMicroelectronics (R&D) Limited.
+ * Author: Pankaj Dev <pankaj.dev@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+#include "stih419.dtsi"
+#include "stihxxx-b2199.dtsi"
+/ {
+	model = "STiH419 B2199";
+	/*
+	 * Keeping "st,stih418", used by power-code, so that same code
+	 * can be used by STIH419
+	 */
+	compatible = "st,stih419-b2199", "st,stih418", "st,stih410";
+
+	memory {
+		device_type = "memory";
+		reg = <0x40000000 0xc0000000>;
+	};
+
+	pwm_regulator: pwm-regulator {
+		compatible = "st,pwm-regulator";
+		status = "okay";
+		pwms = <&pwm1 3 8448>;
+	};
+};

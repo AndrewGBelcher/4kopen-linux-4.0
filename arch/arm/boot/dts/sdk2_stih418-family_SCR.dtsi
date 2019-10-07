@@ -1,0 +1,209 @@
+/*
+ * Copyright (C) 2013 STMicroelectronics Limited.
+ * Author(s): Giuseppe Condorelli <giuseppe.condorelli@st.com>
+ *            Carmelo Amoroso <carmelo.amoroso@st.com>
+ *            Giuseppe Cavallaro <peppe.cavallaro@st.com>
+ *            Nunzio Raciti <nunzio.raciti@st.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * publishhed by the Free Software Foundation.
+ */
+/ {
+	soc {
+
+		pin-controller-front0 {
+			serial0 {
+				pinctrl_scr_serial0_config_c4: scr_uart0-1 {
+					st,pins {
+						c4 = <&PIO17 0 ALT2 BIDIR>;
+					};
+				};
+
+				pinctrl_scr_serial0_config_c7: scr_uart0-2 {
+					st,pins {
+						c7 = <&PIO17 1 ALT2 BIDIR>;
+					};
+				};
+
+				pinctrl_scr_serial0_config_c8: scr_uart0-3 {
+					st,pins {
+						c8 = <&PIO17 6 ALT2 BIDIR>;
+					};
+				};
+			};
+
+			serial1 {
+				pinctrl_scr_serial1_config_c4: scr_uart1-1 {
+					st,pins {
+						c4 = <&PIO16 0 ALT2 BIDIR>;
+					};
+				};
+
+				pinctrl_scr_serial1_config_c7: scr_uart1-2 {
+					st,pins {
+						c7 = <&PIO16 1 ALT2 BIDIR>;
+					};
+				};
+
+				pinctrl_scr_serial1_config_c8: scr_uart1-3 {
+					st,pins {
+						c8 = <&PIO16 6 ALT2 BIDIR>;
+					};
+				};
+			};
+
+			scr0 {
+				pinctrl_scr0_default: scr0-default {
+					st,pins {
+						clk = <&PIO17 5 ALT2 OUT>;
+					};
+				};
+			};
+
+			scr1 {
+				pinctrl_scr1_default: scr1-default {
+					st,pins {
+						clk = <&PIO16 5 ALT2 OUT>;
+					};
+				};
+			};
+			/*CI*/
+			dvbci0-ctrl-sig {
+					pinctrl_ci_ctrl_sig: ci_ctrl_sig {
+						st,pins {
+							CI_VS1 = <&PIO19 1 ALT3 IN>;
+				/*Need to assign to exact value of signal map 8-13 after
+				receiving input from board designer*/
+							CI_PWR1 = <&PIO19 3 ALT3 OUT>;
+							CI_PWR2 = <&PIO19 4 ALT3 OUT>;
+						};
+					};
+			};
+			dvbci0-pin-set0 {
+				pinctrl_dvbci0_pin_set0_default: dvbci0-0-default {
+					st,pins {
+
+						ADDR14 =	<&PIO15 0	ALT3	OUT>;
+						ADDR13 =	<&PIO15 1	ALT3	OUT>;
+						ADDR12 =	<&PIO15 2	ALT3	OUT>;
+						ADDR11 =	<&PIO15 3	ALT3    OUT>;
+						ADDR10 =	<&PIO15 4	ALT3    OUT>;
+						ADDR9  =	<&PIO15 5	ALT3    OUT>;
+						ADDR8  =	<&PIO15 6	ALT3    OUT>;
+						ADDR7  =	<&PIO15 7	ALT3    OUT>;
+						ADDR6  =	<&PIO16 0	ALT3    OUT>;
+						ADDR5  =	<&PIO16 1	ALT3    OUT>;
+						ADDR4  =	<&PIO16 2	ALT3    OUT>;
+						ADDR3  =	<&PIO16 3	ALT3    OUT>;
+						ADDR2  =	<&PIO16 4	ALT3    OUT>;
+						ADDR1  =	<&PIO16 5	ALT3    OUT>;
+
+						DATA0  =	<&PIO18 0	ALT3     BIDIR_PU>;
+						DATA1  =	<&PIO18 1	ALT3     BIDIR_PU>;
+						DATA2  =	<&PIO18 2	ALT3     BIDIR_PU>;
+						DATA3  =	<&PIO18 3	ALT3     BIDIR_PU>;
+						DATA4  =	<&PIO18 4	ALT3     BIDIR_PU>;
+						DATA5  =	<&PIO18 5	ALT3     BIDIR_PU>;
+						DATA6  =	<&PIO18 6	ALT3     BIDIR_PU>;
+						DATA7  =	<&PIO18 7	ALT3     BIDIR_PU>;
+					};
+				};
+			};
+		};
+		pin-controller-front1 {
+			dvbci0-pin-set1 {
+				pinctrl_dvbci0_pin_set1_default: dvbci0-1-default {
+					st,pins {
+						ADDR0  =	<&PIO20 1	ALT3      OUT>;
+						IOWR   =	<&PIO20 0	ALT3      OUT>;
+						WEN    =	<&PIO20 2	ALT3      OUT>;
+						IORDN  =	<&PIO20 3	ALT3      OUT>;
+						WAIT   =	<&PIO20 4	ALT3       IN>;
+						REG    =	<&PIO20 5	ALT3      OUT>;
+						OEN    =	<&PIO20 6	ALT3      OUT>;
+						CS     =	<&PIO20 7	ALT3      OUT>;
+					};
+				};
+			};
+		};
+
+		/* override node asc uart0 properties for SCR driver */
+		serial0: serial@9830000 {
+			compatible = "st,asc_scr";
+			status = "okay";
+			clocks = <&CLK_S_C0_FLEXGEN CLK_EXT2F_A9>;
+			clock-names = "scr_uart_clk";
+			c4-gpio = <&PIO17 0 0>;
+			c7-gpio = <&PIO17 1 0>;
+			c8-gpio = <&PIO17 6 0>;
+
+			pinctrl-names = "default", "config-c4", "config-c7",
+					  "config-c8";
+			pinctrl-0 = <&pinctrl_scr_serial0_config_c7>;
+			pinctrl-1 = <&pinctrl_scr_serial0_config_c4>;
+			pinctrl-2 = <&pinctrl_scr_serial0_config_c7>;
+			pinctrl-3 = <&pinctrl_scr_serial0_config_c8>;
+		};
+
+		serial1: serial@9831000 {
+			compatible = "st,asc_scr";
+			status = "okay";
+			clocks = <&CLK_S_C0_FLEXGEN CLK_EXT2F_A9>;
+			clock-names = "scr_uart_clk";
+			c4-gpio = <&PIO16 0 0>;
+			c7-gpio = <&PIO16 1 0>;
+			c8-gpio = <&PIO16 6 0>;
+
+			pinctrl-names = "default", "config-c4", "config-c7",
+					  "config-c8";
+			pinctrl-0 = <&pinctrl_scr_serial1_config_c7>;
+			pinctrl-1 = <&pinctrl_scr_serial1_config_c4>;
+			pinctrl-2 = <&pinctrl_scr_serial1_config_c7>;
+			pinctrl-3 = <&pinctrl_scr_serial1_config_c8>;
+		};
+	
+		scr0: scr@9848000 {
+			compatible = "st,stih407-scr";
+			reg = <0x9848000 0x1000>;
+			uart = <&serial0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_scr0_default>;
+
+			reset-gpio = <&PIO17 4 0>;
+			vcc-gpio = <&PIO17 2 0>;
+			detect-gpio = <&PIO17 7 0>;
+			class-sel-gpio = <&PIO17 3 0>;
+
+			clocks = <&CLK_S_C0_FLEXGEN CLK_EXT2F_A9>,<&CLK_S_C0_FLEXGEN CLK_DSS_LPC>;
+			clock-names = "scr_clk","scr_clk_ext";
+
+			asc-fifo-size = <512>;
+
+			st,syscon = <&syscfg_core>;
+		};
+
+		/*Enable if scr1 is enabled on  board*/
+		scr1: scr@9849000 {
+			compatible = "st,stih407-scr";
+			reg = <0x9849000 0x1000>;
+			uart = <&serial1>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_scr1_default>;
+
+			reset-gpio = <&PIO16 4 0>;
+			vcc-gpio = <&PIO16 2 0>;
+			detect-gpio = <&PIO16 7 0>;
+			class-sel-gpio = <&PIO16 3 0>;
+
+			clocks = <&CLK_S_C0_FLEXGEN CLK_EXT2F_A9>,<&CLK_S_C0_FLEXGEN CLK_DSS_LPC>;
+			clock-names = "scr_clk","scr_clk_ext";
+
+			asc-fifo-size = <512>;
+
+			st,syscon = <&syscfg_core>;
+
+			status = "disabled";
+		};
+	};
+};
